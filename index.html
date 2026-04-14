@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de RPG Pokémon</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f0f0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 10px solid #cc0000; }
+        h1 { text-align: center; color: #cc0000; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; color: #333; }
+        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .pokemon-card { border: 2px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 10px; background: #fafafa; }
+        .pokemon-card h3 { margin-top: 0; color: #3b4cca; }
+        button { background: #3b4cca; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2a3a8c; }
+        .save-msg { text-align: center; color: green; font-size: 0.9em; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Ficha de Treinador Pokémon</h1>
+    
+    <div class="grid">
+        <div>
+            <label>Nome do Treinador:</label>
+            <input type="text" id="trainerName" class="save">
+        </div>
+        <div>
+            <label>Classe/Ocupação:</label>
+            <input type="text" id="trainerClass" class="save">
+        </div>
+        <div>
+            <label>Região de Origem:</label>
+            <input type="text" id="region" class="save">
+        </div>
+        <div>
+            <label>Dinheiro (PokéDollars):</label>
+            <input type="number" id="money" class="save">
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Equipe Pokémon</h2>
+    <div id="pokemonTeam">
+        <div class="pokemon-card">
+            <h3>Pokémon #1</h3>
+            <div class="grid">
+                <input type="text" placeholder="Espécie" class="save" id="p1-species">
+                <input type="text" placeholder="Apelido" class="save" id="p1-nick">
+                <input type="number" placeholder="Nível" class="save" id="p1-lvl">
+                <input type="text" placeholder="Nature" class="save" id="p1-nature">
+            </div>
+            <textarea placeholder="Ataques e Habilidades..." rows="2" class="save" id="p1-moves"></textarea>
+        </div>
+    </div>
+
+    <label>Inventário / Notas:</label>
+    <textarea id="notes" rows="5" class="save"></textarea>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <button onclick="exportData()">Baixar Ficha (.json)</button>
+        <p class="save-msg" id="msg">Dados salvos automaticamente!</p>
+    </div>
+</div>
+
+<script>
+    // Salva automaticamente enquanto digita
+    const inputs = document.querySelectorAll('.save');
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            localStorage.setItem(input.id, input.value);
+            showMsg();
+        });
+        // Carrega dados ao abrir
+        const savedValue = localStorage.getItem(input.id);
+        if (savedValue) input.value = savedValue;
+    });
+
+    function showMsg() {
+        const msg = document.getElementById('msg');
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 1000);
+    }
+
+    function exportData() {
+        const data = {};
+        inputs.forEach(input => data[input.id] = input.value);
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'ficha_pokemon.json';
+        a.click();
+    }
+</script>
+
+</body>
+</html>
