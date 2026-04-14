@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokéSheet Cloud Ultra - Gimmick Edition</title>
+    <title>PokéSheet Cloud Ultra - Gimmick Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
@@ -89,17 +89,17 @@
 
         .pkmn-header { display: flex; gap: 12px; align-items: center; }
         
-        /* Frame do Pokémon com suporte a Gimmick */
         .sprite-frame { 
             width: 85px; height: 85px; background: #000; border-radius: 18px; 
             display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);
             position: relative; overflow: hidden;
         }
-        .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; transform: scale(1.3); }
+        .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; transform: scale(1.4); }
         
         .gimmick-badge {
-            position: absolute; bottom: 4px; right: 4px; width: 22px; height: 22px;
-            background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 5;
+            position: absolute; bottom: 5px; right: 5px; width: 24px; height: 24px;
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            pointer-events: none; z-index: 5; filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
         }
 
         .search-area { position: relative; flex: 1; }
@@ -108,7 +108,6 @@
             border-radius: 10px; z-index: 100; max-height: 150px; overflow-y: auto; display: none;
         }
         .results-box div { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
-        .results-box div:hover { background: var(--secondary); }
 
         .btn {
             padding: 10px 15px; border-radius: 10px; border: none; 
@@ -226,11 +225,12 @@
 
     const natures = ['Adamant', 'Bashful', 'Bold', 'Brave', 'Calm', 'Careful', 'Docile', 'Gentle', 'Hardy', 'Hasty', 'Impish', 'Jolly', 'Lonely', 'Mild', 'Modest', 'Naive', 'Naughty', 'Quiet', 'Quirky', 'Rash', 'Relaxed', 'Sassy', 'Serious', 'Timid'];
     
+    // Ícones Oficiais das Mecânicas (Símbolos)
     const gimmicks = {
-        "Mega": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/medallion-mega-evolution.png",
-        "Z-Move": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/z-ring.png",
-        "G-Max": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/dynamax-band.png",
-        "Tera": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/tera-orb.png"
+        "Mega": "https://raw.githubusercontent.com/msikma/pokesprite/master/misc/battle-icon/mega.png",
+        "Z-Move": "https://raw.githubusercontent.com/msikma/pokesprite/master/misc/battle-icon/z-move.png",
+        "G-Max": "https://raw.githubusercontent.com/msikma/pokesprite/master/misc/battle-icon/gigantamax.png",
+        "Tera": "https://raw.githubusercontent.com/msikma/pokesprite/master/misc/battle-icon/terastal.png"
     };
 
     const worldData = {
@@ -335,7 +335,8 @@
             const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
             const d = await r.json();
             const img = document.getElementById(`img-${slot}`);
-            img.src = d.sprites.other['official-artwork'].front_default || d.sprites.front_default; 
+            // Uso do sprite frontal padrão para manter o aspecto pixelado proporcional ao tamanho ampliado
+            img.src = d.sprites.front_default; 
             img.style.display = "block";
             moveCache[slot] = d.moves;
             updateMoves(slot, restoreData);
@@ -371,7 +372,6 @@
         const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎\n- Nome: ${d('t-name')}\n- Sexo: ${d('t-sex')}\n- Idade: ${d('t-age')}\n- Dinheiro: ₽ ${d('t-money')}\n\n━━━━❰BOLSA❱━━━━\n${bagText}\n━━━━▣━━◤POKÉMONS◢━━▣━━━━━\n${pkmnText}`;
         const res = document.getElementById('convert-result');
         res.innerText = template; res.style.display = 'block';
-        alert("Convertido!");
     }
 
     async function cloudAction(type) {
