@@ -218,7 +218,22 @@
                 <div class="input-group"><label>Sexo</label><select id="t-sex" class="save" onchange="updateBagIcon()"><option value="">-</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option><option value="Outro">Outro</option></select></div>
                 <div class="input-group"><label>Idade</label><input type="number" id="t-age" class="save" min="10"></div>
                 <div class="input-group"><label>Altura</label><input type="text" id="t-height" class="save" placeholder="Ex: 1.75"></div>
-                <div class="input-group"><label>Classe</label><select id="t-class" class="save"><option value="Treinador">Treinador</option><option value="Coordenador">Coordenador</option><option value="Criador">Criador</option><option value="Pesquisador">Pesquisador</option><option value="Ranger">Ranger</option><option value="Rocket">Equipe Rocket</option></select></div>
+                <div class="input-group"><label>Classe</label>
+                    <select id="t-class" class="save">
+                        <option value="Treinador (a)">Treinador (a)</option>
+                        <option value="Coordenador (a)">Coordenador (a)</option>
+                        <option value="Cuidador (a)">Cuidador (a)</option>
+                        <option value="Professor (a)">Professor (a)</option>
+                        <option value="Enfermeiro (a)">Enfermeiro (a)</option>
+                        <option value="Guarda">Guarda</option>
+                        <option value="Policial">Policial</option>
+                        <option value="Fotógrafo (a)">Fotógrafo (a)</option>
+                        <option value="Pesquisador (a)">Pesquisador (a)</option>
+                        <option value="Rocket">Rocket</option>
+                        <option value="Fazendeiro (a)">Fazendeiro (a)</option>
+                        <option value="Cientista">Cientista</option>
+                    </select>
+                </div>
                 <div class="input-group"><label>Região</label><select id="t-region" class="save" onchange="updateCities()"></select></div>
                 <div class="input-group"><label>Cidade</label><select id="t-city" class="save"></select></div>
                 <div class="input-group full-width"><label>Aparência</label><input type="text" id="t-appearance" class="save"></div>
@@ -344,7 +359,6 @@
         else icon.classList.add('bag-male');
     }
 
-    // Função corrigida para descer até o final máximo
     function fastScroll() {
         setTimeout(() => {
             window.scrollTo({
