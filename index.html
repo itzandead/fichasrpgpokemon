@@ -266,5 +266,140 @@
     </div>
     <div id="team" class="team-grid"></div>
 
-    <div class="
-        
+    <div class="section-header">
+        <h2>Inventário & Recursos</h2>
+        <div class="line"></div>
+    </div>
+    <div class="panel inv-grid">
+        <div class="input-group">
+            <label>Bolsa de Itens</label>
+            <textarea id="t-bag" class="save" rows="6" placeholder="Pocão x5&#10;Pokébola x10&#10;Mapa de Região..."></textarea>
+        </div>
+        <div class="money-card">
+            <label>SALDO ATUAL</label>
+            <input type="text" id="t-money" class="save" value="0">
+            <span style="font-size: 0.7rem; color: #6ee7b7; margin-top: 10px; font-weight: 700;">MOEDA: POKÉDOLLAR (₽)</span>
+        </div>
+    </div>
+
+    <div class="panel">
+        <label>Anotações Adicionais</label>
+        <textarea id="notes" class="save" rows="3" placeholder="Insígnias, conquistas ou história..."></textarea>
+        <button class="btn btn-convert" onclick="convertSheet()">Gerar Ficha Textual para RPG</button>
+        <div id="convert-result"></div>
+    </div>
+</div>
+
+<div id="crop-modal">
+    <div class="crop-container"><img id="image-to-crop"></div>
+    <div style="margin-top:30px; display:flex; gap:15px;">
+        <button class="btn" style="background:rgba(255,255,255,0.1); color: white;" onclick="document.getElementById('crop-modal').style.display='none'">CANCELAR</button>
+        <button class="btn btn-green" onclick="finishCrop()">CORTAR E SALVAR</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<script>
+    const SUPABASE_URL = 'https://pjggfdjixenopkiiugmj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZ2dmZGppeGVub3BraWl1Z21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMjIwMDcsImV4cCI6MjA5MTY5ODAwN30.QWr9d3qT2216to7VOEmc_hzu-g789FTLdYdDUtUosk0';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allPkmn = [];
+    let moveCache = {};
+    let cropper;
+
+    const natures = ['Adamant', 'Bashful', 'Bold', 'Brave', 'Calm', 'Careful', 'Docile', 'Gentle', 'Hardy', 'Hasty', 'Impish', 'Jolly', 'Lonely', 'Mild', 'Modest', 'Naive', 'Naughty', 'Quiet', 'Quirky', 'Rash', 'Relaxed', 'Sassy', 'Serious', 'Timid'];
+    
+    const worldData = {
+        "Kanto": ["Pallet Town", "Viridian City", "Pewter City", "Cerulean City", "Vermilion City", "Lavender Town", "Celadon City", "Fuchsia City", "Saffron City", "Cinnabar Island"],
+        "Johto": ["New Bark Town", "Cherrygrove City", "Violet City", "Azalea Town", "Goldenrod City", "Ecruteak City", "Olivine City", "Cianwood City", "Mahogany Town", "Blackthorn City"],
+        "Hoenn": ["Littleroot Town", "Oldale Town", "Petalburg City", "Rustboro City", "Dewford Town", "Slateport City", "Mauville City", "Verdanturf Town", "Fallarbor Town", "Lavaridge Town", "Fortree City", "Lilycove City", "Mossdeep City", "Sootopolis City"],
+        "Sinnoh": ["Twinleaf Town", "Sandgem Town", "Jubilife City", "Oreburgh City", "Floaroma Town", "Eterna City", "Hearthome City", "Solaceon Town", "Veilstone City", "Pastoria City", "Celestic Town", "Canalave City", "Snowpoint City", "Sunyshore City"],
+        "Unova": ["Nuvema Town", "Accumula Town", "Striaton City", "Nacrene City", "Castelia City", "Nimbasa City", "Driftveil City", "Mistralton City", "Icirrus City", "Opelucid City", "Humilau City"],
+        "Kalos": ["Vaniville Town", "Santalune City", "Lumiose City", "Camphrier Town", "Cyllage City", "Ambrette Town", "Shalour City", "Coumarine City", "Laverre City", "Dendemille Town", "Anistar City", "Snowbelle City"],
+        "Alola": ["Hau'oli City", "Heahea City", "Konikoni City", "Malie City", "Tapu Village", "Seafolk Village"],
+        "Galar": ["Postwick", "Wedgehurst", "Motostoke", "Turffield", "Hulbury", "Hammerlocke", "Stow-on-Side", "Ballonlea", "Circhester", "Spikemuth", "Wyndon"],
+        "Paldea": ["Cabo Poco", "Mesagoza", "Cortondo", "Artazon", "Levincia", "Cascarrafa", "Porto Marinada", "Medali", "Montenevera", "Alfornada", "Glaseado"]
+    };
+
+    function format(str) { return str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+
+    async function init() {
+        const regSelect = document.getElementById('t-region');
+        regSelect.innerHTML = '<option value="">Região...</option>';
+        Object.keys(worldData).forEach(r => regSelect.innerHTML += `<option value="${r}">${r}</option>`);
+        renderSlots();
+        try {
+            const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+            const d = await r.json();
+            allPkmn = d.results;
+        } catch(e) { console.error("API Error"); }
+    }
+
+    function renderSlots() {
+        const team = document.getElementById('team'); team.innerHTML = "";
+        for(let i=1; i<=6; i++) {
+            team.innerHTML += `
+            <div class="pkmn-card">
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <div class="sprite-container"><img id="img-${i}" style="display:none"></div>
+                    <div class="search-container">
+                        <label>Pokémon #${i}</label>
+                        <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie...">
+                        <div id="drop-${i}" class="search-results"></div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 80px; gap:10px">
+                    <select id="p${i}-nature" class="save"><option value="">Nature</option>${natures.map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
+                    <input type="number" id="p${i}-lvl" class="save" value="1" min="1" max="100" onchange="updateMoves(${i})">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+                    <select id="p${i}-m1" class="save"></select><select id="p${i}-m2" class="save"></select>
+                    <select id="p${i}-m3" class="save"></select><select id="p${i}-m4" class="save"></select>
+                </div>
+            </div>`;
+        }
+    }
+
+    function updateCities() {
+        const r = document.getElementById('t-region').value;
+        const s = document.getElementById('t-city');
+        const cur = s.value;
+        s.innerHTML = '<option value="">Cidade...</option>';
+        if(worldData[r]) worldData[r].forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+        if(cur) s.value = cur;
+    }
+
+    function doSearch(slot) {
+        const q = document.getElementById(`p${slot}-name`).value.toLowerCase();
+        const drop = document.getElementById(`drop-${slot}`); drop.innerHTML = "";
+        if(q.length < 2) return drop.style.display="none";
+        const hits = allPkmn.filter(p => p.name.includes(q)).slice(0, 5);
+        if(hits.length) {
+            drop.style.display="block";
+            hits.forEach(p => {
+                const d = document.createElement('div'); d.innerText = format(p.name);
+                d.onclick = () => selectPkmn(slot, p.name);
+                drop.appendChild(d);
+            });
+        }
+    }
+
+    async function selectPkmn(slot, name, restoreData = null) {
+        document.getElementById(`p${slot}-name`).value = format(name);
+        document.getElementById(`drop-${slot}`).style.display = "none";
+        try {
+            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+            const d = await r.json();
+            document.getElementById(`img-${slot}`).src = d.sprites.front_default;
+            document.getElementById(`img-${slot}`).style.display = "block";
+            moveCache[slot] = d.moves;
+            updateMoves(slot, restoreData);
+        } catch(e) {}
+    }
+
+    function updateMoves(slot, restoreData = null) {
+        const moves = moveCache[slot]; if(!moves) return;
+        const lvl = parseInt(doc
