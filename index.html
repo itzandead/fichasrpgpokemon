@@ -167,28 +167,25 @@
         </div>
 
         <div class="form-grid">
-            <div class="input-group full-width"><label>Nome Completo</label><input type="text" id="t-name" class="save"></div>
+            <div class="input-group full-width"><label>Nome</label><input type="text" id="t-name" class="save"></div>
             <div class="input-group"><label>Sexo</label><select id="t-sex" class="save"><option value="">-</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option><option value="Outro">Outro</option></select></div>
             <div class="input-group"><label>Idade</label><input type="number" id="t-age" class="save" min="10"></div>
             <div class="input-group"><label>Classe</label><select id="t-class" class="save"><option value="Treinador">Treinador</option><option value="Coordenador">Coordenador</option><option value="Criador">Criador</option><option value="Pesquisador">Pesquisador</option><option value="Ranger">Ranger</option><option value="Rocket">Equipe Rocket</option></select></div>
             <div class="input-group"><label>Região</label><select id="t-region" class="save" onchange="updateCities()"></select></div>
             <div class="input-group full-width"><label>Cidade</label><select id="t-city" class="save"></select></div>
-            <div class="input-group full-width"><label>Descrição Física / Créditos</label><input type="text" id="t-appearance" class="save"></div>
+            <div class="input-group full-width"><label>Aparência</label><input type="text" id="t-appearance" class="save"></div>
         </div>
     </div>
 
-    <div class="section-tag"><h2>Equipe Pokémon</h2><div class="line"></div></div>
+    <div class="section-tag"><h2>Time Pokémon</h2><div class="line"></div></div>
     <div id="team" class="team-grid"></div>
 
-    <div class="section-tag"><h2>Bolsa & Notas</h2><div class="line"></div></div>
+    <div class="section-tag"><h2>Inventário</h2><div class="line"></div></div>
     <div class="panel inv-layout">
         <div class="input-group"><label>Itens no Inventário</label><textarea id="t-bag" class="save" rows="4" placeholder="Itens..."></textarea></div>
         <div class="money-box"><label style="color:var(--accent)"> ₽ DINHEIRO</label><br><input type="text" id="t-money" class="save" value="0"></div>
     </div>
 
-    <div class="panel">
-        <label>Anotações Adicionais</label>
-        <textarea id="notes" class="save" rows="2"></textarea>
         <button class="btn btn-convert" onclick="convertSheet()">✨ GERAR FICHA EM TEXTO</button>
         <div id="convert-result"></div>
     </div>
@@ -220,7 +217,7 @@
     const gimmicks = {
         "Mega": "https://i.ibb.co/3510nxGs/key-stone-by-jormxdos-dfftdg1-414w.png",
         "Z-Move": "https://i.ibb.co/0RCRx7VG/z-ring-icon-by-jormxdos-dffutkv-fullview.png",
-        "G-Max": "https://i.ibb.co/K1t5pYy/gigantamax-icon-by-jormxdos-dffv4gc-fullview.png",
+        "Dynamax": "https://i.ibb.co/K1t5pYy/gigantamax-icon-by-jormxdos-dffv4gc-fullview.png",
         "Tera": "https://i.ibb.co/4ZzfQZ5c/terastal-phenomenon-icon-by-jormxdos-dffvs1r-fullview.png"
     };
 
@@ -273,7 +270,7 @@
                         <option value="">Gimmick</option>
                         <option value="Mega">Mega</option>
                         <option value="Z-Move">Z-Move</option>
-                        <option value="G-Max">G-Max</option>
+                        <option value="Dynamax">Dynamax</option>
                         <option value="Tera">Tera</option>
                     </select>
                 </div>
