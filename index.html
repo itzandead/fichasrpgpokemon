@@ -24,7 +24,6 @@
         body { background: radial-gradient(circle at top right, #111827, #05080f); color: var(--text); padding: 15px; min-height: 100vh; }
         .container { max-width: 1100px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
 
-        /* Auth Bar & Custom Title */
         .auth-bar { background: var(--surface); backdrop-filter: blur(15px); padding: 18px 25px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); flex-wrap: wrap; gap: 15px; }
         
         .logo-container { position: relative; display: inline-block; padding-right: 40px; }
@@ -59,7 +58,6 @@
         .pass-container input { padding-right: 35px; }
         .toggle-pass { position: absolute; right: 10px; cursor: pointer; opacity: 0.6; font-size: 0.8rem; }
 
-        /* Tabs Navigation */
         .tabs-nav { display: flex; gap: 10px; margin-bottom: -10px; }
         .tab-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 25px; border-radius: 15px 15px 0 0; cursor: pointer; font-weight: 700; transition: 0.3s; }
         .tab-btn.active { background: var(--secondary); color: white; border-bottom: none; }
@@ -84,7 +82,6 @@
 
         input, select, textarea { background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 12px; font-size: 0.85rem; width: 100%; }
 
-        /* Status & Pokemon Card */
         .stats-container { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
         .stat-row { display: grid; grid-template-columns: 80px 1fr 1fr 1fr; gap: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; }
         .stat-label { font-size: 0.7rem; font-weight: 800; color: var(--text-dim); }
@@ -96,15 +93,17 @@
         .pkmn-header { display: flex; gap: 12px; align-items: center; }
         
         .sprite-frame { width: 85px; height: 85px; background: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); position: relative; overflow: hidden; }
-        .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); image-rendering: pixelated; }
+        .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); image-rendering: pixelated; position: absolute; top: 0; left: 0; }
         
         .gimmick-badge { position: absolute; bottom: 5px; right: 5px; width: 28px; height: 28px; background-size: contain; background-repeat: no-repeat; background-position: center; pointer-events: none; z-index: 10; filter: drop-shadow(0 0 2px black); }
         .shiny-toggle { position: absolute; top: 5px; left: 5px; cursor: pointer; z-index: 15; font-size: 1.2rem; filter: grayscale(1); transition: 0.3s; }
         .shiny-toggle.active { filter: grayscale(0) drop-shadow(0 0 5px var(--shiny)); }
 
         .search-area { position: relative; flex: 1; }
-        .results-box { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border-radius: 10px; z-index: 100; max-height: 150px; overflow-y: auto; display: none; }
-        .results-box div { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .results-box { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border-radius: 10px; z-index: 100; max-height: 150px; overflow-y: auto; display: none; border: 1px solid var(--secondary); }
+        .results-box div { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.85rem; display: flex; align-items: center; gap: 10px; }
+        .results-box div:hover { background: rgba(255,255,255,0.1); }
+        .results-box img { width: 24px; height: 24px; object-fit: contain; }
 
         .btn { padding: 10px 15px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.3s; }
         .btn-green { background: var(--accent); color: #05080f; }
@@ -203,6 +202,7 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let allPkmn = [];
+    let allItems = [];
     let pkmnFullData = {}; 
     let moveCache = {};
     let cropper;
@@ -257,9 +257,12 @@
         Object.keys(worldData).forEach(r => regSelect.innerHTML += `<option value="${r}">${r}</option>`);
         renderSlots();
         try {
-            const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=10000');
-            const d = await r.json();
-            allPkmn = d.results;
+            const [pr, ir] = await Promise.all([
+                fetch('https://pokeapi.co/api/v2/pokemon?limit=10000'),
+                fetch('https://pokeapi.co/api/v2/item?limit=2000')
+            ]);
+            allPkmn = (await pr.json()).results;
+            allItems = (await ir.json()).results;
         } catch(e) {}
     }
 
@@ -289,7 +292,11 @@
                 </div>
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
-                    <div class="input-group"><label>Item</label><input type="text" id="p${i}-item" class="save" placeholder="Item segurando..."></div>
+                    <div class="search-area">
+                        <label>Item</label>
+                        <input type="text" id="p${i}-item" class="save" oninput="doItemSearch(${i})" placeholder="Item...">
+                        <div id="drop-item-${i}" class="results-box"></div>
+                    </div>
                     <div class="input-group">
                         <label>Gimmick</label>
                         <select id="p${i}-gim" class="save" onchange="updateGimmickIcon(${i})">
@@ -334,10 +341,19 @@
         hiddenInput.value = !isShiny;
         btn.classList.toggle('active', !isShiny);
         if (pkmnFullData[slot]) {
-            const img = document.getElementById(`img-${slot}`);
-            const data = pkmnFullData[slot];
-            img.src = !isShiny ? (data.sprites.other['official-artwork'].front_shiny || data.sprites.front_shiny) : (data.sprites.other['official-artwork'].front_default || data.sprites.front_default);
+            updatePkmnImage(slot, pkmnFullData[slot], !isShiny);
         }
+    }
+
+    // Função centralizada para imagem evitar desnível
+    function updatePkmnImage(slot, data, isShiny) {
+        const img = document.getElementById(`img-${slot}`);
+        // Prioriza artwork oficial para manter o estilo parelho
+        const shinyUrl = data.sprites.other['official-artwork'].front_shiny || data.sprites.front_shiny;
+        const defaultUrl = data.sprites.other['official-artwork'].front_default || data.sprites.front_default;
+        
+        img.src = isShiny ? shinyUrl : defaultUrl;
+        img.style.display = "block";
     }
 
     function calcStats(slot) {
@@ -392,8 +408,29 @@
         if(hits.length) {
             drop.style.display="block";
             hits.forEach(p => {
-                const d = document.createElement('div'); d.innerText = format(p.name);
+                const id = p.url.split('/')[6];
+                const d = document.createElement('div');
+                d.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png"> <span>${format(p.name)}</span>`;
                 d.onclick = () => selectPkmn(slot, p.name);
+                drop.appendChild(d);
+            });
+        }
+    }
+
+    function doItemSearch(slot) {
+        const q = document.getElementById(`p${slot}-item`).value.toLowerCase().replace(/ /g, '-');
+        const drop = document.getElementById(`drop-item-${slot}`); drop.innerHTML = "";
+        if(q.length < 2) return drop.style.display="none";
+        const hits = allItems.filter(i => i.name.includes(q)).slice(0, 10);
+        if(hits.length) {
+            drop.style.display="block";
+            hits.forEach(item => {
+                const d = document.createElement('div');
+                d.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item.name}.png" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'"> <span>${format(item.name)}</span>`;
+                d.onclick = () => {
+                    document.getElementById(`p${slot}-item`).value = format(item.name);
+                    drop.style.display = "none";
+                };
                 drop.appendChild(d);
             });
         }
@@ -406,15 +443,16 @@
             const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
             const d = await r.json();
             pkmnFullData[slot] = d;
-            const img = document.getElementById(`img-${slot}`);
+            
             const isShiny = document.getElementById(`p${slot}-is-shiny`).value === 'true';
-            img.src = isShiny ? (d.sprites.other['official-artwork'].front_shiny || d.sprites.front_shiny) : (d.sprites.other['official-artwork'].front_default || d.sprites.front_default);
-            img.style.display = "block";
+            updatePkmnImage(slot, d, isShiny);
+
             const abSelect = document.getElementById(`p${slot}-ability`);
             const curAb = abSelect.value;
             abSelect.innerHTML = '<option value="">Habilidade</option>';
             d.abilities.forEach(a => abSelect.innerHTML += `<option value="${format(a.ability.name)}">${format(a.ability.name)}</option>`);
             if (restoreData) abSelect.value = restoreData[`p${slot}-ability`]; else abSelect.value = curAb;
+            
             if(!restoreData) {
                 d.stats.forEach((s, idx) => {
                     const map = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
