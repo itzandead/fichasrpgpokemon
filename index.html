@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokéSheet Cloud Ultra - Versão Completa</title>
+    <title>PokéSheet Cloud Ultra - Gimmick Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
@@ -88,9 +88,18 @@
         }
 
         .pkmn-header { display: flex; gap: 12px; align-items: center; }
+        
+        /* Frame do Pokémon com suporte a Gimmick */
         .sprite-frame { 
-            width: 65px; height: 65px; background: #000; border-radius: 14px; 
+            width: 85px; height: 85px; background: #000; border-radius: 18px; 
             display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);
+            position: relative; overflow: hidden;
+        }
+        .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; transform: scale(1.3); }
+        
+        .gimmick-badge {
+            position: absolute; bottom: 4px; right: 4px; width: 22px; height: 22px;
+            background-size: contain; background-repeat: no-repeat; pointer-events: none; z-index: 5;
         }
 
         .search-area { position: relative; flex: 1; }
@@ -123,7 +132,6 @@
         }
         .crop-wrap { width: 85vw; height: 85vw; max-width: 350px; max-height: 350px; background: #000; overflow: hidden; }
 
-        /* Media Queries para Desktop */
         @media (min-width: 768px) {
             .auth-inputs { width: auto; }
             .auth-inputs input { width: 150px; }
@@ -218,7 +226,13 @@
 
     const natures = ['Adamant', 'Bashful', 'Bold', 'Brave', 'Calm', 'Careful', 'Docile', 'Gentle', 'Hardy', 'Hasty', 'Impish', 'Jolly', 'Lonely', 'Mild', 'Modest', 'Naive', 'Naughty', 'Quiet', 'Quirky', 'Rash', 'Relaxed', 'Sassy', 'Serious', 'Timid'];
     
-    // RESTAURADO: Lista completa de cidades sem omissões
+    const gimmicks = {
+        "Mega": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/medallion-mega-evolution.png",
+        "Z-Move": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/z-ring.png",
+        "G-Max": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/dynamax-band.png",
+        "Tera": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/tera-orb.png"
+    };
+
     const worldData = {
         "Kanto": ["Pallet Town", "Viridian City", "Pewter City", "Cerulean City", "Vermilion City", "Lavender Town", "Celadon City", "Fuchsia City", "Saffron City", "Cinnabar Island"],
         "Johto": ["New Bark Town", "Cherrygrove City", "Violet City", "Azalea Town", "Goldenrod City", "Ecruteak City", "Olivine City", "Cianwood City", "Mahogany Town", "Blackthorn City"],
@@ -242,7 +256,7 @@
             const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
             const d = await r.json();
             allPkmn = d.results;
-        } catch(e) { console.error("API error"); }
+        } catch(e) {}
     }
 
     function renderSlots() {
@@ -251,22 +265,42 @@
             team.innerHTML += `
             <div class="pkmn-card">
                 <div class="pkmn-header">
-                    <div class="sprite-frame"><img id="img-${i}" style="display:none; width:55px"></div>
+                    <div class="sprite-frame">
+                        <img id="img-${i}" class="pkmn-img" style="display:none">
+                        <div id="gim-badge-${i}" class="gimmick-badge"></div>
+                    </div>
                     <div class="search-area">
                         <label>Pokémon #${i}</label>
                         <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie...">
                         <div id="drop-${i}" class="results-box"></div>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 70px; gap:8px">
+                <div style="display:grid; grid-template-columns: 1fr 60px 85px; gap:8px">
                     <select id="p${i}-nature" class="save"><option value="">Nature</option>${natures.map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
                     <input type="number" id="p${i}-lvl" class="save" value="1" min="1" max="100" onchange="updateMoves(${i})">
+                    <select id="p${i}-gim" class="save" onchange="updateGimmickIcon(${i})">
+                        <option value="">Gimmick</option>
+                        <option value="Mega">Mega</option>
+                        <option value="Z-Move">Z-Move</option>
+                        <option value="G-Max">G-Max</option>
+                        <option value="Tera">Tera</option>
+                    </select>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
                     <select id="p${i}-m1" class="save"></select><select id="p${i}-m2" class="save"></select>
                     <select id="p${i}-m3" class="save"></select><select id="p${i}-m4" class="save"></select>
                 </div>
             </div>`;
+        }
+    }
+
+    function updateGimmickIcon(slot) {
+        const val = document.getElementById(`p${slot}-gim`).value;
+        const badge = document.getElementById(`gim-badge-${slot}`);
+        if(val && gimmicks[val]) {
+            badge.style.backgroundImage = `url('${gimmicks[val]}')`;
+        } else {
+            badge.style.backgroundImage = 'none';
         }
     }
 
@@ -301,7 +335,8 @@
             const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
             const d = await r.json();
             const img = document.getElementById(`img-${slot}`);
-            img.src = d.sprites.front_default; img.style.display = "block";
+            img.src = d.sprites.other['official-artwork'].front_default || d.sprites.front_default; 
+            img.style.display = "block";
             moveCache[slot] = d.moves;
             updateMoves(slot, restoreData);
         } catch(e) {}
@@ -330,11 +365,13 @@
         for(let i=1; i<=6; i++) {
             const pName = document.getElementById(`p${i}-name`).value;
             const pLvl = document.getElementById(`p${i}-lvl`).value;
-            pkmnText += `╰┈➤ ${pName ? `${pName} (Lv. ${pLvl})` : "Vazio"}\n`;
+            const pGim = document.getElementById(`p${i}-gim`).value;
+            pkmnText += `╰┈➤ ${pName ? `${pName} (Lv. ${pLvl})${pGim ? ` [${pGim}]` : ""}` : "Vazio"}\n`;
         }
         const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎\n- Nome: ${d('t-name')}\n- Sexo: ${d('t-sex')}\n- Idade: ${d('t-age')}\n- Dinheiro: ₽ ${d('t-money')}\n\n━━━━❰BOLSA❱━━━━\n${bagText}\n━━━━▣━━◤POKÉMONS◢━━▣━━━━━\n${pkmnText}`;
         const res = document.getElementById('convert-result');
         res.innerText = template; res.style.display = 'block';
+        alert("Convertido!");
     }
 
     async function cloudAction(type) {
@@ -352,7 +389,10 @@
                 if(data.avatar) { const img = document.getElementById('main-avatar'); img.src = data.avatar; img.style.display='block'; document.getElementById('placeholder').style.display='none'; }
                 updateCities();
                 document.getElementById('t-city').value = data.data['t-city'];
-                for(let i=1; i<=6; i++) { if(data.data[`p${i}-name`]) selectPkmn(i, data.data[`p${i}-name`].toLowerCase().replace(/ /g, '-'), data.data); }
+                for(let i=1; i<=6; i++) { 
+                    if(data.data[`p${i}-name`]) selectPkmn(i, data.data[`p${i}-name`].toLowerCase().replace(/ /g, '-'), data.data);
+                    updateGimmickIcon(i);
+                }
                 alert("Carregado!");
             } else alert("Acesso negado.");
         }
