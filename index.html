@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokéSheet Cloud v5.0</title>
+    <title>PokéSheet Cloud v5.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
@@ -32,7 +32,7 @@
         .search-results { position: absolute; top: 100%; left: 0; right: 0; background: #1a202c; border: 1px solid var(--secondary); border-radius: 8px; z-index: 100; max-height: 200px; overflow-y: auto; display: none; }
         .search-results div { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
         .search-results div:hover { background: var(--secondary); }
-        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; }
+        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.2s; }
         .btn-blue { background: var(--secondary); color: white; }
         .btn-green { background: #10b981; color: white; }
         #crop-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
@@ -60,11 +60,15 @@
         <input type="file" id="file-input" hidden accept="image/*">
         
         <div class="grid-header">
-            <div><label>Nome</label><input type="text" id="t-name" class="save"></div>
+            <div><label>Nome do Treinador</label><input type="text" id="t-name" class="save"></div>
             <div>
                 <label>Classe</label>
                 <select id="t-class" class="save">
                     <option value="Treinador">Treinador</option>
+                    <option value="Coordenador">Coordenador</option>
+                    <option value="Criador">Criador</option>
+                    <option value="Pesquisador">Pesquisador</option>
+                    <option value="Ranger">Pokémon Ranger</option>
                     <option value="Rocket">Equipe Rocket</option>
                     <option value="Cientista">Cientista</option>
                 </select>
@@ -77,8 +81,8 @@
     <div id="team" class="team-grid"></div>
 
     <div class="panel">
-        <label>Diário</label>
-        <textarea id="notes" class="save" rows="3"></textarea>
+        <label>Diário & Inventário</label>
+        <textarea id="notes" class="save" rows="3" placeholder="Anotações da sua jornada..."></textarea>
     </div>
 </div>
 
@@ -99,10 +103,18 @@
     let moveCache = {};
     let cropper;
 
+    const natures = ['Adamant', 'Bashful', 'Bold', 'Brave', 'Calm', 'Careful', 'Docile', 'Gentle', 'Hardy', 'Hasty', 'Impish', 'Jolly', 'Lonely', 'Mild', 'Modest', 'Naive', 'Naughty', 'Quiet', 'Quirky', 'Rash', 'Relaxed', 'Sassy', 'Serious', 'Timid'];
+
     const worldData = {
-        "Kanto": ["Pallet Town", "Viridian City", "Pewter City"],
-        "Johto": ["New Bark Town", "Cherrygrove City"],
-        "Paldea": ["Mesagoza", "Levincia"] // Adicione as outras conforme desejar
+        "Kanto": ["Pallet Town", "Viridian City", "Pewter City", "Cerulean City", "Vermilion City", "Lavender Town", "Celadon City", "Fuchsia City", "Saffron City", "Cinnabar Island"],
+        "Johto": ["New Bark Town", "Cherrygrove City", "Violet City", "Azalea Town", "Goldenrod City", "Ecruteak City", "Olivine City", "Cianwood City", "Mahogany Town", "Blackthorn City"],
+        "Hoenn": ["Littleroot Town", "Oldale Town", "Petalburg City", "Rustboro City", "Dewford Town", "Slateport City", "Mauville City", "Verdanturf Town", "Fallarbor Town", "Lavaridge Town", "Fortree City", "Lilycove City", "Mossdeep City", "Sootopolis City"],
+        "Sinnoh": ["Twinleaf Town", "Sandgem Town", "Jubilife City", "Oreburgh City", "Floaroma Town", "Eterna City", "Hearthome City", "Solaceon Town", "Veilstone City", "Pastoria City", "Celestic Town", "Canalave City", "Snowpoint City", "Sunyshore City"],
+        "Unova": ["Nuvema Town", "Accumula Town", "Striaton City", "Nacrene City", "Castelia City", "Nimbasa City", "Driftveil City", "Mistralton City", "Icirrus City", "Opelucid City", "Humilau City"],
+        "Kalos": ["Vaniville Town", "Santalune City", "Lumiose City", "Camphrier Town", "Cyllage City", "Ambrette Town", "Shalour City", "Coumarine City", "Laverre City", "Dendemille Town", "Anistar City", "Snowbelle City"],
+        "Alola": ["Hau'oli City", "Heahea City", "Konikoni City", "Malie City", "Tapu Village", "Seafolk Village"],
+        "Galar": ["Postwick", "Wedgehurst", "Motostoke", "Turffield", "Hulbury", "Hammerlocke", "Stow-on-Side", "Ballonlea", "Circhester", "Spikemuth", "Wyndon"],
+        "Paldea": ["Cabo Poco", "Mesagoza", "Cortondo", "Artazon", "Levincia", "Cascarrafa", "Porto Marinada", "Medali", "Montenevera", "Alfornada", "Glaseado"]
     };
 
     function format(str) { return str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
@@ -120,7 +132,6 @@
 
     function renderSlots() {
         const team = document.getElementById('team');
-        const nats = ['Adamant', 'Bold', 'Timid', 'Modest'];
         team.innerHTML = "";
         for(let i=1; i<=6; i++) {
             team.innerHTML += `
@@ -128,12 +139,13 @@
                 <div style="display:flex; gap:10px; align-items:center;">
                     <div class="sprite-box"><img id="img-${i}" style="display:none"></div>
                     <div style="flex:1; position:relative">
+                        <label>Pokémon #${i}</label>
                         <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Pokémon...">
                         <div id="drop-${i}" class="search-results"></div>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 60px; gap:5px">
-                    <select id="p${i}-nature" class="save"><option value="">Nature</option>${nats.map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
+                <div style="display:grid; grid-template-columns: 1fr 65px; gap:5px">
+                    <select id="p${i}-nature" class="save"><option value="">Nature</option>${natures.map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
                     <input type="number" id="p${i}-lvl" class="save" value="1" onchange="updateMoves(${i})">
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px">
@@ -161,7 +173,7 @@
         }
     }
 
-    async function selectPkmn(slot, name) {
+    async function selectPkmn(slot, name, restoreMoves = null) {
         document.getElementById(`p${slot}-name`).value = format(name);
         document.getElementById(`drop-${slot}`).style.display = "none";
         const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
@@ -169,20 +181,19 @@
         document.getElementById(`img-${slot}`).src = d.sprites.front_default;
         document.getElementById(`img-${slot}`).style.display = "block";
         moveCache[slot] = d.moves;
-        updateMoves(slot);
+        updateMoves(slot, restoreMoves);
     }
 
-    function updateMoves(slot) {
+    function updateMoves(slot, restoreMoves = null) {
         const moves = moveCache[slot]; if(!moves) return;
         const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value);
         const avail = moves.filter(m => m.version_group_details.some(vd => vd.level_learned_at <= lvl)).map(m => m.move.name);
         const unique = [...new Set(avail)].map(format).sort();
         for(let i=1; i<=4; i++) {
             const s = document.getElementById(`p${slot}-m${i}`);
-            const old = s.value;
             s.innerHTML = '<option value="">Golpe</option>';
             unique.forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
-            s.value = old;
+            if(restoreMoves) s.value = restoreMoves[`p${slot}-m${i}`];
         }
     }
 
@@ -199,9 +210,31 @@
         } else {
             const { data, error } = await _supabase.from('fichas').select('*').eq('username', user).single();
             if(data && data.password === pass) {
-                Object.keys(data.data).forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = data.data[id]; });
-                if(data.avatar) { document.getElementById('main-avatar').src = data.avatar; document.getElementById('main-avatar').style.display='block'; document.getElementById('placeholder').style.display='none'; }
+                // Preenche campos básicos
+                Object.keys(data.data).forEach(id => { 
+                    const el = document.getElementById(id);
+                    if(el) el.value = data.data[id]; 
+                });
+                
+                // Restaura Avatar
+                if(data.avatar) { 
+                    document.getElementById('main-avatar').src = data.avatar; 
+                    document.getElementById('main-avatar').style.display='block'; 
+                    document.getElementById('placeholder').style.display='none'; 
+                }
+
+                // Restaura Cidades (Precisa dar o trigger manual)
                 updateCities();
+                document.getElementById('t-city').value = data.data['t-city'];
+
+                // Restaura Pokémons e Golpes
+                for(let i=1; i<=6; i++) {
+                    const pkName = data.data[`p${i}-name`];
+                    if(pkName) {
+                        const slug = pkName.toLowerCase().replace(/ /g, '-');
+                        selectPkmn(i, slug, data.data);
+                    }
+                }
                 alert("Carregado!");
             } else alert("Dados incorretos.");
         }
@@ -210,8 +243,10 @@
     function updateCities() {
         const r = document.getElementById('t-region').value;
         const s = document.getElementById('t-city');
+        const currentVal = s.value;
         s.innerHTML = '<option value="">Cidade...</option>';
         if(worldData[r]) worldData[r].forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+        if(currentVal) s.value = currentVal;
     }
 
     document.getElementById('file-input').addEventListener('change', function(e) {
