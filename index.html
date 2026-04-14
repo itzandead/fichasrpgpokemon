@@ -102,5 +102,232 @@
                     <option value="Treinador">Treinador</option>
                     <option value="Coordenador">Coordenador</option>
                     <option value="Criador">Criador</option>
-                    <option value="Pesquisador
-                        
+                    <option value="Pesquisador">Pesquisador</option>
+                    <option value="Ranger">Pokémon Ranger</option>
+                </select>
+            </div>
+            <div><label>Região</label><select id="t-region" class="save" onchange="updateCities()"></select></div>
+            <div><label>Cidade</label><select id="t-city" class="save"></select></div>
+            <div style="grid-column: span 3;"><label>Aparência (Descrição/Fonte do Avatar)</label><input type="text" id="t-appearance" class="save" placeholder="Ex: Artista no Pinterest / Cabelos pretos e jaqueta azul"></div>
+        </div>
+    </div>
+
+    <div class="section-title">Pokémon</div>
+    <div id="team" class="team-grid"></div>
+
+    <div class="section-title">Inventário</div>
+    <div class="panel inv-grid">
+        <div>
+            <label>Bolsa (Itens)</label>
+            <textarea id="t-bag" class="save" rows="5" placeholder="Liste seus itens aqui (um por linha)..."></textarea>
+        </div>
+        <div class="money-display">
+            <label style="color: #a7f3d0;">DINHEIRO (₽)</label>
+            <input type="text" id="t-money" class="save" value="0">
+        </div>
+    </div>
+
+    <div class="panel">
+        <label>Notas da Jornada</label>
+        <textarea id="notes" class="save" rows="3"></textarea>
+        <button class="btn btn-convert" onclick="convertSheet()">✨ CONVERTER PARA FICHA TEXTUAL</button>
+        <div id="convert-result"></div>
+    </div>
+</div>
+
+<div id="crop-modal">
+    <div class="crop-container"><img id="image-to-crop"></div>
+    <div style="margin-top:20px; display:flex; gap:10px;">
+        <button class="btn" style="background:#555" onclick="document.getElementById('crop-modal').style.display='none'">CANCELAR</button>
+        <button class="btn btn-green" onclick="finishCrop()">CONFIRMAR</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<script>
+    const SUPABASE_URL = 'https://pjggfdjixenopkiiugmj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZ2dmZGppeGVub3BraWl1Z21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMjIwMDcsImV4cCI6MjA5MTY5ODAwN30.QWr9d3qT2216to7VOEmc_hzu-g789FTLdYdDUtUosk0';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allPkmn = [];
+    let moveCache = {};
+    let cropper;
+
+    const natures = ['Adamant', 'Bashful', 'Bold', 'Brave', 'Calm', 'Careful', 'Docile', 'Gentle', 'Hardy', 'Hasty', 'Impish', 'Jolly', 'Lonely', 'Mild', 'Modest', 'Naive', 'Naughty', 'Quiet', 'Quirky', 'Rash', 'Relaxed', 'Sassy', 'Serious', 'Timid'];
+    const worldData = { "Kanto": ["Pallet Town", "Viridian City", "Pewter City"], "Johto": ["New Bark Town", "Violet City"], "Hoenn": ["Littleroot Town", "Rustboro City"], "Sinnoh": ["Twinleaf Town", "Jubilife City"], "Unova": ["Nuvema Town", "Castelia City"], "Kalos": ["Vaniville Town", "Lumiose City"], "Alola": ["Hau'oli City"], "Galar": ["Postwick"], "Paldea": ["Cabo Poco"] };
+
+    function format(str) { return str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+
+    async function init() {
+        const regSelect = document.getElementById('t-region');
+        regSelect.innerHTML = '<option value="">Região...</option>';
+        Object.keys(worldData).forEach(r => regSelect.innerHTML += `<option value="${r}">${r}</option>`);
+        renderSlots();
+        const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+        const d = await r.json();
+        allPkmn = d.results;
+    }
+
+    function renderSlots() {
+        const team = document.getElementById('team'); team.innerHTML = "";
+        for(let i=1; i<=6; i++) {
+            team.innerHTML += `
+            <div class="pkmn-card">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <div class="sprite-box"><img id="img-${i}" style="display:none"></div>
+                    <div class="search-container">
+                        <label>Pokémon #${i}</label>
+                        <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie...">
+                        <div id="drop-${i}" class="search-results"></div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 65px; gap:5px">
+                    <select id="p${i}-nature" class="save"><option value="">Nature</option>${natures.map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
+                    <input type="number" id="p${i}-lvl" class="save" value="1" min="1" onchange="updateMoves(${i})">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px">
+                    <select id="p${i}-m1" class="save"></select><select id="p${i}-m2" class="save"></select>
+                    <select id="p${i}-m3" class="save"></select><select id="p${i}-m4" class="save"></select>
+                </div>
+            </div>`;
+        }
+    }
+
+    function doSearch(slot) {
+        const q = document.getElementById(`p${slot}-name`).value.toLowerCase();
+        const drop = document.getElementById(`drop-${slot}`); drop.innerHTML = "";
+        if(q.length < 2) return drop.style.display="none";
+        const hits = allPkmn.filter(p => p.name.includes(q)).slice(0, 5);
+        if(hits.length) {
+            drop.style.display="block";
+            hits.forEach(p => {
+                const d = document.createElement('div'); d.innerText = format(p.name);
+                d.onclick = () => selectPkmn(slot, p.name);
+                drop.appendChild(d);
+            });
+        }
+    }
+
+    async function selectPkmn(slot, name, restoreData = null) {
+        document.getElementById(`p${slot}-name`).value = format(name);
+        document.getElementById(`drop-${slot}`).style.display = "none";
+        try {
+            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+            const d = await r.json();
+            document.getElementById(`img-${slot}`).src = d.sprites.front_default;
+            document.getElementById(`img-${slot}`).style.display = "block";
+            moveCache[slot] = d.moves;
+            updateMoves(slot, restoreData);
+        } catch(e) {}
+    }
+
+    function updateMoves(slot, restoreData = null) {
+        const moves = moveCache[slot]; if(!moves) return;
+        const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 1;
+        const avail = moves.filter(m => m.version_group_details.some(vd => vd.move_learn_method.name === 'level-up' && vd.level_learned_at <= lvl)).map(m => m.move.name);
+        const unique = [...new Set(avail)].map(format).sort();
+        for(let i=1; i<=4; i++) {
+            const s = document.getElementById(`p${slot}-m${i}`);
+            const cur = s.value; s.innerHTML = '<option value="">Golpe</option>';
+            unique.forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
+            if(restoreData) s.value = restoreData[`p${slot}-m${i}`]; else s.value = cur;
+        }
+    }
+
+    function convertSheet() {
+        const d = (id) => document.getElementById(id).value || "---";
+        
+        // Formatação da Bolsa
+        const bagLines = document.getElementById('t-bag').value.split('\n').filter(l => l.trim() !== "");
+        let bagText = "";
+        const linesToRender = Math.max(3, bagLines.length);
+        for(let i=0; i < linesToRender; i++) {
+            bagText += `╰┈➤ ${bagLines[i] || ""}\n`;
+        }
+
+        // Formatação dos Pokémons
+        let pkmnText = "";
+        for(let i=1; i<=6; i++) {
+            const pName = document.getElementById(`p${i}-name`).value;
+            const pLvl = document.getElementById(`p${i}-lvl`).value;
+            pkmnText += `╰┈➤ ${pName ? `${pName} (Lv. ${pLvl})` : "Vazio"}\n`;
+        }
+
+        const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎
+
+- Nome do Treinador: ${d('t-name')}
+- Sexo: ${d('t-sex')}
+- Idade: ${d('t-age')}
+- Aparência: ${d('t-appearance')}
+- Altura: ${d('t-height')}
+- Classe: ${d('t-class')}
+- Dinheiro: ₽ ${d('t-money')}
+
+━━━━❰BOLSA❱━━━━
+${bagText}
+━━━━▣━━◤POKÉMONS◢━━▣━━━━━
+${pkmnText}
+━━━━▣━━◤INSÍGNIAS◢━━▣━━━━━
+𓊈1𓊉 𓊈2𓊉 𓊈3𓊉 𓊈4𓊉 𓊈5𓊉 𓊈6𓊉 𓊈7𓊉 𓊈8𓊉
+
+━━━━▣━━◤×××××××◢━━▣━━━━━`;
+
+        const res = document.getElementById('convert-result');
+        res.innerText = template;
+        res.style.display = 'block';
+        alert("Ficha convertida! Role para baixo para copiar.");
+    }
+
+    async function cloudAction(type) {
+        const user = document.getElementById('user-id').value;
+        const pass = document.getElementById('user-pass').value;
+        if(!user || !pass) return alert("Dados incompletos.");
+        if(type === 'save') {
+            const sheet = {}; document.querySelectorAll('.save').forEach(el => sheet[el.id] = el.value);
+            const { error } = await _supabase.from('fichas').upsert({ username: user, password: pass, data: sheet, avatar: document.getElementById('main-avatar').src }, { onConflict: 'username' });
+            if(error) alert(error.message); else alert("Salvo!");
+        } else {
+            const { data } = await _supabase.from('fichas').select('*').eq('username', user).single();
+            if(data && data.password === pass) {
+                Object.keys(data.data).forEach(id => { const el = document.getElementById(id); if(el) el.value = data.data[id]; });
+                if(data.avatar) { const img = document.getElementById('main-avatar'); img.src = data.avatar; img.style.display='block'; document.getElementById('placeholder').style.display='none'; }
+                updateCities(); document.getElementById('t-city').value = data.data['t-city'];
+                for(let i=1; i<=6; i++) { if(data.data[`p${i}-name`]) selectPkmn(i, data.data[`p${i}-name`].toLowerCase().replace(/ /g, '-'), data.data); }
+                alert("Carregado!");
+            } else alert("Erro nos dados.");
+        }
+    }
+
+    function updateCities() {
+        const r = document.getElementById('t-region').value; const s = document.getElementById('t-city');
+        const cur = s.value; s.innerHTML = '<option value="">Cidade...</option>';
+        if(worldData[r]) worldData[r].forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+        if(cur) s.value = cur;
+    }
+
+    document.getElementById('file-input').addEventListener('change', function(e) {
+        if(!e.target.files.length) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = document.getElementById('image-to-crop'); img.src = event.target.result;
+            document.getElementById('crop-modal').style.display = 'flex';
+            if(cropper) cropper.destroy();
+            cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 1, cropBoxMovable: false, cropBoxResizable: false });
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    });
+
+    function finishCrop() {
+        const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
+        const mainImg = document.getElementById('main-avatar');
+        mainImg.src = canvas.toDataURL(); mainImg.style.display = 'block';
+        document.getElementById('placeholder').style.display = 'none';
+        document.getElementById('crop-modal').style.display = 'none';
+    }
+
+    init();
+</script>
+</body>
+</html>
