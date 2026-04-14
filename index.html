@@ -3,70 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokéSheet Cloud v5.6 - Organizador</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>PokéSheet Pro — Elite Trainer Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
         :root {
-            --bg: #0b0f1a; --card: #161e2d; --primary: #ff4747; 
-            --secondary: #4785ff; --text: #f1f5f9; --muted: #64748b;
-            --border: #2d3748; --input: #0b0f1a; --accent: #10b981;
+            --bg-deep: #080a12;
+            --bg-panel: rgba(22, 28, 45, 0.7);
+            --primary: #ff4757;
+            --secondary: #3e82ff;
+            --accent: #00d2d3;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: blur(12px);
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 10px; padding-bottom: 50px; }
-        .container { max-width: 1100px; margin: auto; display: flex; flex-direction: column; gap: 25px; }
         
-        /* Cabeçalhos de Seção */
-        .section-title { font-size: 1.4rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-top: 10px; display: flex; align-items: center; gap: 10px; }
-        .section-title::before { content: '◈'; color: var(--secondary); }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: radial-gradient(circle at top right, #1e293b, #080a12);
+            color: var(--text-main); 
+            padding: 20px; 
+            min-height: 100vh;
+            line-height: 1.5;
+        }
 
-        .auth-bar { background: linear-gradient(90deg, #1a202c, #2d3748); padding: 15px 20px; border-radius: 12px; display: flex; gap: 12px; align-items: center; border: 1px solid var(--border); justify-content: space-between; flex-wrap: wrap; }
-        .auth-inputs { display: flex; gap: 8px; align-items: center; }
-        .auth-bar input { background: #000; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; width: 140px; }
+        .container { max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 30px; }
 
-        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; box-shadow: 0 15px 25px rgba(0,0,0,0.4); }
-        .header-top { border-left: 6px solid var(--primary); display: flex; gap: 25px; flex-wrap: wrap; align-items: flex-start; }
+        /* Auth Bar Modernizada */
+        .auth-bar { 
+            background: var(--bg-panel);
+            backdrop-filter: var(--glass);
+            padding: 15px 30px; 
+            border-radius: 20px; 
+            display: flex; 
+            align-items: center; 
+            border: 1px solid var(--border); 
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
         
-        .avatar-box { width: 140px; height: 140px; background: var(--input); border: 2px dashed var(--muted); border-radius: 50%; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; background: linear-gradient(90deg, var(--primary), #ff6b81); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .auth-inputs { display: flex; gap: 12px; }
+        .auth-inputs input { 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--border); 
+            color: white; 
+            padding: 10px 15px; 
+            border-radius: 12px; 
+            width: 160px;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .auth-inputs input:focus { border-color: var(--secondary); outline: none; background: rgba(0,0,0,0.5); }
+
+        /* Seções */
+        .section-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 5px;
+        }
+        .section-header h2 { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .line { height: 1px; flex: 1; background: var(--border); }
+
+        .panel { 
+            background: var(--bg-panel); 
+            backdrop-filter: var(--glass);
+            border: 1px solid var(--border); 
+            border-radius: 24px; 
+            padding: 30px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+        }
+
+        /* Avatar */
+        .header-top { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+        .avatar-wrapper { position: relative; }
+        .avatar-box { 
+            width: 160px; height: 160px; 
+            background: #111827; 
+            border: 3px solid var(--border); 
+            border-radius: 40px; 
+            overflow: hidden; 
+            cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .avatar-box:hover { transform: scale(1.02); border-color: var(--secondary); box-shadow: 0 0 20px rgba(62, 130, 255, 0.3); }
         .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        .grid-header { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-        label { font-size: 0.62rem; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; display: block; }
         
-        input, select, textarea { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; width: 100%; outline: none; font-size: 0.9rem; }
-        input:focus { border-color: var(--secondary); }
+        /* Inputs Gerais */
+        .grid-header { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
-        .pkmn-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        input, select, textarea { 
+            background: rgba(15, 23, 42, 0.6); 
+            border: 1px solid var(--border); 
+            color: #fff; 
+            padding: 14px; 
+            border-radius: 14px; 
+            font-size: 0.95rem; 
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--secondary); background: rgba(15, 23, 42, 0.9); box-shadow: 0 0 0 4px rgba(62, 130, 255, 0.1); outline: none; }
+
+        /* Pokémon Cards */
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+        .pkmn-card { 
+            background: rgba(30, 41, 59, 0.5); 
+            border: 1px solid var(--border); 
+            border-radius: 24px; 
+            padding: 20px; 
+            display: flex; flex-direction: column; gap: 15px; 
+            transition: 0.3s;
+        }
+        .pkmn-card:hover { background: rgba(30, 41, 59, 0.8); transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
         
-        .sprite-box { width: 70px; height: 70px; background: #000; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .sprite-box img { width: 65px; height: 65px; }
+        .sprite-container { 
+            width: 80px; height: 80px; 
+            background: #0f172a; 
+            border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border);
+        }
+        .sprite-container img { width: 70px; height: 70px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
 
-        .search-container { position: relative; flex: 1; }
-        .search-results { position: absolute; top: 100%; left: 0; right: 0; background: #1a202c; border: 1px solid var(--secondary); border-radius: 8px; z-index: 100; max-height: 200px; overflow-y: auto; display: none; }
-        .search-results div { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); }
+        /* Inventário */
+        .inv-grid { display: grid; grid-template-columns: 1fr 280px; gap: 25px; }
+        .money-card { 
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); 
+            border-radius: 20px; 
+            padding: 25px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .money-card input { background: transparent; border: none; font-size: 2rem; text-align: center; font-weight: 800; color: #34d399; width: 100%; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
 
-        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.2s; }
-        .btn-blue { background: var(--secondary); color: white; }
-        .btn-green { background: var(--accent); color: white; }
-        .btn-convert { background: #8b5cf6; color: white; width: 100%; font-size: 1rem; margin-top: 10px; }
+        /* Botões */
+        .btn { 
+            padding: 14px 24px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; 
+            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: all 0.3s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-blue { background: linear-gradient(135deg, #3e82ff 0%, #2563eb 100%); color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-convert { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; width: 100%; font-size: 0.9rem; margin-top: 20px; height: 55px; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .btn:active { transform: translateY(0); }
 
-        /* Estilo Inventário */
-        .inv-grid { display: grid; grid-template-columns: 1fr 200px; gap: 15px; }
-        .money-display { background: #064e3b; border: 2px solid var(--accent); color: #fff; padding: 20px; border-radius: 12px; text-align: center; }
-        .money-display input { background: transparent; border: none; font-size: 1.5rem; text-align: center; font-weight: bold; color: var(--accent); }
+        /* Resultados */
+        #convert-result { 
+            display: none; margin-top: 25px; 
+            background: #020617; color: #10b981; 
+            font-family: 'Fira Code', monospace; padding: 25px; 
+            border-radius: 18px; border: 1px solid #1e293b; 
+            white-space: pre-wrap; font-size: 0.9rem; 
+            line-height: 1.6;
+            animation: fadeIn 0.5s ease;
+        }
 
-        #crop-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .crop-container { width: 100%; max-width: 400px; height: 400px; background: #000; border-radius: 12px; overflow: hidden; position: relative; }
-        
-        #convert-result { display: none; margin-top: 20px; background: #000; color: #10b981; font-family: monospace; padding: 15px; border-radius: 8px; border: 1px solid var(--accent); white-space: pre-wrap; font-size: 0.85rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modal */
+        #crop-modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; 
+            backdrop-filter: blur(10px);
+        }
+        .crop-container { width: 100%; max-width: 450px; height: 450px; background: #000; border-radius: 30px; overflow: hidden; border: 1px solid var(--border); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="auth-bar">
-        <div style="font-weight: 800; color: var(--primary);">POKÉSHEET CLOUD</div>
+        <div class="logo">POKÉSHEET PRO</div>
         <div class="auth-inputs">
             <input type="text" id="user-id" placeholder="Usuário">
             <input type="password" id="user-pass" placeholder="Senha">
@@ -75,28 +198,43 @@
         </div>
     </div>
 
-    <div class="section-title">Ficha de Treinador</div>
+    <div class="section-header">
+        <h2>Ficha de Treinador</h2>
+        <div class="line"></div>
+    </div>
+    
     <div class="panel header-top">
-        <div onclick="document.getElementById('file-input').click()" class="avatar-box">
-            <img id="main-avatar" style="display:none">
-            <span id="placeholder">FOTO</span>
+        <div class="avatar-wrapper">
+            <div onclick="document.getElementById('file-input').click()" class="avatar-box">
+                <img id="main-avatar" style="display:none">
+                <span id="placeholder">ADICIONAR FOTO</span>
+            </div>
+            <input type="file" id="file-input" hidden accept="image/*">
         </div>
-        <input type="file" id="file-input" hidden accept="image/*">
         
         <div class="grid-header">
-            <div style="grid-column: span 2;"><label>Nome do Treinador</label><input type="text" id="t-name" class="save"></div>
-            <div>
+            <div class="input-group" style="grid-column: span 2;">
+                <label>Nome do Treinador</label>
+                <input type="text" id="t-name" class="save" placeholder="Ex: Red Ketchum">
+            </div>
+            <div class="input-group">
                 <label>Sexo</label>
                 <select id="t-sex" class="save">
-                    <option value="">Selecione...</option>
+                    <option value="">Escolher...</option>
                     <option value="Masculino">Masculino</option>
                     <option value="Feminino">Feminino</option>
                     <option value="Outro">Outro</option>
                 </select>
             </div>
-            <div><label>Idade <span style="color:var(--primary)">(Mín. 10)</span></label><input type="number" id="t-age" class="save" min="10"></div>
-            <div><label>Altura</label><input type="text" id="t-height" class="save" placeholder="Ex: 1,70m"></div>
-            <div>
+            <div class="input-group">
+                <label>Idade <span style="color:var(--primary)">• Mín. 10</span></label>
+                <input type="number" id="t-age" class="save" min="10" placeholder="10">
+            </div>
+            <div class="input-group">
+                <label>Altura</label>
+                <input type="text" id="t-height" class="save" placeholder="1.70m">
+            </div>
+            <div class="input-group">
                 <label>Classe</label>
                 <select id="t-class" class="save">
                     <option value="Treinador">Treinador</option>
@@ -104,230 +242,29 @@
                     <option value="Criador">Criador</option>
                     <option value="Pesquisador">Pesquisador</option>
                     <option value="Ranger">Pokémon Ranger</option>
+                    <option value="Rocket">Equipe Rocket</option>
                 </select>
             </div>
-            <div><label>Região</label><select id="t-region" class="save" onchange="updateCities()"></select></div>
-            <div><label>Cidade</label><select id="t-city" class="save"></select></div>
-            <div style="grid-column: span 3;"><label>Aparência (Descrição/Fonte do Avatar)</label><input type="text" id="t-appearance" class="save" placeholder="Ex: Artista no Pinterest / Cabelos pretos e jaqueta azul"></div>
+            <div class="input-group">
+                <label>Região</label>
+                <select id="t-region" class="save" onchange="updateCities()"></select>
+            </div>
+            <div class="input-group">
+                <label>Cidade</label>
+                <select id="t-city" class="save"></select>
+            </div>
+            <div class="input-group" style="grid-column: span 3;">
+                <label>Aparência (Descrição Visual ou Fonte)</label>
+                <input type="text" id="t-appearance" class="save" placeholder="Ex: Trajes de Galar, olhos castanhos...">
+            </div>
         </div>
     </div>
 
-    <div class="section-title">Pokémon</div>
+    <div class="section-header">
+        <h2>Equipe Pokémon</h2>
+        <div class="line"></div>
+    </div>
     <div id="team" class="team-grid"></div>
 
-    <div class="section-title">Inventário</div>
-    <div class="panel inv-grid">
-        <div>
-            <label>Bolsa (Itens)</label>
-            <textarea id="t-bag" class="save" rows="5" placeholder="Liste seus itens aqui (um por linha)..."></textarea>
-        </div>
-        <div class="money-display">
-            <label style="color: #a7f3d0;">DINHEIRO (₽)</label>
-            <input type="text" id="t-money" class="save" value="0">
-        </div>
-    </div>
-
-    <div class="panel">
-        <label>Notas da Jornada</label>
-        <textarea id="notes" class="save" rows="3"></textarea>
-        <button class="btn btn-convert" onclick="convertSheet()">✨ CONVERTER PARA FICHA TEXTUAL</button>
-        <div id="convert-result"></div>
-    </div>
-</div>
-
-<div id="crop-modal">
-    <div class="crop-container"><img id="image-to-crop"></div>
-    <div style="margin-top:20px; display:flex; gap:10px;">
-        <button class="btn" style="background:#555" onclick="document.getElementById('crop-modal').style.display='none'">CANCELAR</button>
-        <button class="btn btn-green" onclick="finishCrop()">CONFIRMAR</button>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
-<script>
-    const SUPABASE_URL = 'https://pjggfdjixenopkiiugmj.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZ2dmZGppeGVub3BraWl1Z21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMjIwMDcsImV4cCI6MjA5MTY5ODAwN30.QWr9d3qT2216to7VOEmc_hzu-g789FTLdYdDUtUosk0';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let allPkmn = [];
-    let moveCache = {};
-    let cropper;
-
-    const natures = ['Adamant', 'Bashful', 'Bold', 'Brave', 'Calm', 'Careful', 'Docile', 'Gentle', 'Hardy', 'Hasty', 'Impish', 'Jolly', 'Lonely', 'Mild', 'Modest', 'Naive', 'Naughty', 'Quiet', 'Quirky', 'Rash', 'Relaxed', 'Sassy', 'Serious', 'Timid'];
-    const worldData = { "Kanto": ["Pallet Town", "Viridian City", "Pewter City"], "Johto": ["New Bark Town", "Violet City"], "Hoenn": ["Littleroot Town", "Rustboro City"], "Sinnoh": ["Twinleaf Town", "Jubilife City"], "Unova": ["Nuvema Town", "Castelia City"], "Kalos": ["Vaniville Town", "Lumiose City"], "Alola": ["Hau'oli City"], "Galar": ["Postwick"], "Paldea": ["Cabo Poco"] };
-
-    function format(str) { return str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
-
-    async function init() {
-        const regSelect = document.getElementById('t-region');
-        regSelect.innerHTML = '<option value="">Região...</option>';
-        Object.keys(worldData).forEach(r => regSelect.innerHTML += `<option value="${r}">${r}</option>`);
-        renderSlots();
-        const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-        const d = await r.json();
-        allPkmn = d.results;
-    }
-
-    function renderSlots() {
-        const team = document.getElementById('team'); team.innerHTML = "";
-        for(let i=1; i<=6; i++) {
-            team.innerHTML += `
-            <div class="pkmn-card">
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <div class="sprite-box"><img id="img-${i}" style="display:none"></div>
-                    <div class="search-container">
-                        <label>Pokémon #${i}</label>
-                        <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie...">
-                        <div id="drop-${i}" class="search-results"></div>
-                    </div>
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 65px; gap:5px">
-                    <select id="p${i}-nature" class="save"><option value="">Nature</option>${natures.map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
-                    <input type="number" id="p${i}-lvl" class="save" value="1" min="1" onchange="updateMoves(${i})">
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px">
-                    <select id="p${i}-m1" class="save"></select><select id="p${i}-m2" class="save"></select>
-                    <select id="p${i}-m3" class="save"></select><select id="p${i}-m4" class="save"></select>
-                </div>
-            </div>`;
-        }
-    }
-
-    function doSearch(slot) {
-        const q = document.getElementById(`p${slot}-name`).value.toLowerCase();
-        const drop = document.getElementById(`drop-${slot}`); drop.innerHTML = "";
-        if(q.length < 2) return drop.style.display="none";
-        const hits = allPkmn.filter(p => p.name.includes(q)).slice(0, 5);
-        if(hits.length) {
-            drop.style.display="block";
-            hits.forEach(p => {
-                const d = document.createElement('div'); d.innerText = format(p.name);
-                d.onclick = () => selectPkmn(slot, p.name);
-                drop.appendChild(d);
-            });
-        }
-    }
-
-    async function selectPkmn(slot, name, restoreData = null) {
-        document.getElementById(`p${slot}-name`).value = format(name);
-        document.getElementById(`drop-${slot}`).style.display = "none";
-        try {
-            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-            const d = await r.json();
-            document.getElementById(`img-${slot}`).src = d.sprites.front_default;
-            document.getElementById(`img-${slot}`).style.display = "block";
-            moveCache[slot] = d.moves;
-            updateMoves(slot, restoreData);
-        } catch(e) {}
-    }
-
-    function updateMoves(slot, restoreData = null) {
-        const moves = moveCache[slot]; if(!moves) return;
-        const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 1;
-        const avail = moves.filter(m => m.version_group_details.some(vd => vd.move_learn_method.name === 'level-up' && vd.level_learned_at <= lvl)).map(m => m.move.name);
-        const unique = [...new Set(avail)].map(format).sort();
-        for(let i=1; i<=4; i++) {
-            const s = document.getElementById(`p${slot}-m${i}`);
-            const cur = s.value; s.innerHTML = '<option value="">Golpe</option>';
-            unique.forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
-            if(restoreData) s.value = restoreData[`p${slot}-m${i}`]; else s.value = cur;
-        }
-    }
-
-    function convertSheet() {
-        const d = (id) => document.getElementById(id).value || "---";
+    <div class="
         
-        // Formatação da Bolsa
-        const bagLines = document.getElementById('t-bag').value.split('\n').filter(l => l.trim() !== "");
-        let bagText = "";
-        const linesToRender = Math.max(3, bagLines.length);
-        for(let i=0; i < linesToRender; i++) {
-            bagText += `╰┈➤ ${bagLines[i] || ""}\n`;
-        }
-
-        // Formatação dos Pokémons
-        let pkmnText = "";
-        for(let i=1; i<=6; i++) {
-            const pName = document.getElementById(`p${i}-name`).value;
-            const pLvl = document.getElementById(`p${i}-lvl`).value;
-            pkmnText += `╰┈➤ ${pName ? `${pName} (Lv. ${pLvl})` : "Vazio"}\n`;
-        }
-
-        const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎
-
-- Nome do Treinador: ${d('t-name')}
-- Sexo: ${d('t-sex')}
-- Idade: ${d('t-age')}
-- Aparência: ${d('t-appearance')}
-- Altura: ${d('t-height')}
-- Classe: ${d('t-class')}
-- Dinheiro: ₽ ${d('t-money')}
-
-━━━━❰BOLSA❱━━━━
-${bagText}
-━━━━▣━━◤POKÉMONS◢━━▣━━━━━
-${pkmnText}
-━━━━▣━━◤INSÍGNIAS◢━━▣━━━━━
-𓊈1𓊉 𓊈2𓊉 𓊈3𓊉 𓊈4𓊉 𓊈5𓊉 𓊈6𓊉 𓊈7𓊉 𓊈8𓊉
-
-━━━━▣━━◤×××××××◢━━▣━━━━━`;
-
-        const res = document.getElementById('convert-result');
-        res.innerText = template;
-        res.style.display = 'block';
-        alert("Ficha convertida! Role para baixo para copiar.");
-    }
-
-    async function cloudAction(type) {
-        const user = document.getElementById('user-id').value;
-        const pass = document.getElementById('user-pass').value;
-        if(!user || !pass) return alert("Dados incompletos.");
-        if(type === 'save') {
-            const sheet = {}; document.querySelectorAll('.save').forEach(el => sheet[el.id] = el.value);
-            const { error } = await _supabase.from('fichas').upsert({ username: user, password: pass, data: sheet, avatar: document.getElementById('main-avatar').src }, { onConflict: 'username' });
-            if(error) alert(error.message); else alert("Salvo!");
-        } else {
-            const { data } = await _supabase.from('fichas').select('*').eq('username', user).single();
-            if(data && data.password === pass) {
-                Object.keys(data.data).forEach(id => { const el = document.getElementById(id); if(el) el.value = data.data[id]; });
-                if(data.avatar) { const img = document.getElementById('main-avatar'); img.src = data.avatar; img.style.display='block'; document.getElementById('placeholder').style.display='none'; }
-                updateCities(); document.getElementById('t-city').value = data.data['t-city'];
-                for(let i=1; i<=6; i++) { if(data.data[`p${i}-name`]) selectPkmn(i, data.data[`p${i}-name`].toLowerCase().replace(/ /g, '-'), data.data); }
-                alert("Carregado!");
-            } else alert("Erro nos dados.");
-        }
-    }
-
-    function updateCities() {
-        const r = document.getElementById('t-region').value; const s = document.getElementById('t-city');
-        const cur = s.value; s.innerHTML = '<option value="">Cidade...</option>';
-        if(worldData[r]) worldData[r].forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
-        if(cur) s.value = cur;
-    }
-
-    document.getElementById('file-input').addEventListener('change', function(e) {
-        if(!e.target.files.length) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = document.getElementById('image-to-crop'); img.src = event.target.result;
-            document.getElementById('crop-modal').style.display = 'flex';
-            if(cropper) cropper.destroy();
-            cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 1, cropBoxMovable: false, cropBoxResizable: false });
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    });
-
-    function finishCrop() {
-        const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
-        const mainImg = document.getElementById('main-avatar');
-        mainImg.src = canvas.toDataURL(); mainImg.style.display = 'block';
-        document.getElementById('placeholder').style.display = 'none';
-        document.getElementById('crop-modal').style.display = 'none';
-    }
-
-    init();
-</script>
-</body>
-</html>
