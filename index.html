@@ -3,97 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha de RPG Pokémon</title>
+    <title>PokéSheet - Sua Ficha RPG</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f0f0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 10px solid #cc0000; }
-        h1 { text-align: center; color: #cc0000; text-transform: uppercase; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; color: #333; }
-        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .pokemon-card { border: 2px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 10px; background: #fafafa; }
-        .pokemon-card h3 { margin-top: 0; color: #3b4cca; }
-        button { background: #3b4cca; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #2a3a8c; }
-        .save-msg { text-align: center; color: green; font-size: 0.9em; margin-top: 10px; display: none; }
+        /* Variáveis de Cores Temáticas */
+        :root {
+            --poke-red: #cc0000;
+            --poke-blue: #3b4cca;
+            --poke-yellow: #ffde00;
+            --bg-pokedex: #e0e0e0;
+            --panel-bg: #ffffff;
+            --text-main: #333333;
+            --border-width: 4px;
+        }
+
+        /* Reset e Estilo Global */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-pokedex);
+            background-image: radial-gradient(#ccc 10%, transparent 10%);
+            background-size: 20px 20px;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Contêiner Principal (Estilo Pokédex) */
+        .pokedex-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--poke-red);
+            border: var(--border-width) solid #a00000;
+            border-radius: 25px;
+            box-shadow: 10px 10px 25px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Detalhes Visuais da Pokédex */
+        .pokedex-container::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 30px;
+            height: 30px;
+            background-color: #00eeff;
+            border: 5px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00eeff;
+        }
+
+        /* Cabeçalho */
+        h1.pokedex-title {
+            text-align: center;
+            color: var(--poke-yellow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 60px 0 20px 0;
+            font-size: 2em;
+            text-shadow: 3px 3px 0 var(--poke-blue);
+        }
+
+        /* Painel Interno Branco (Tela) */
+        .screen-panel {
+            background-color: var(--panel-bg);
+            margin: 0 20px 20px 20px;
+            padding: 25px;
+            border-radius: 15px;
+            border: var(--border-width) solid #555;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        /* Seções e Títulos */
+        fieldset {
+            border: 2px solid var(--poke-blue);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+
+        legend {
+            font-weight: bold;
+            color: var(--poke-blue);
+            text-transform: uppercase;
+            padding: 0 10px;
+            background-color: white;
+        }
+
+        /* Inputs e Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--poke-red);
+            outline: none;
+            box-shadow: 0 0 8px rgba(204,0,0,0.2);
+        }
+
+        /* Cartões de Pokémon Individual */
+        .pokemon-team {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .pokemon-card {
+            border: 2px dashed var(--poke-blue);
+            padding: 15px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        }
+
+        .pokemon-card h3 {
+            margin-top: 0;
+            color: white;
+            background-color: var(--poke-blue);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        /* Botões */
+        .button-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button.btn-export {
+            background-color: var(--poke-blue);
+            color: white;
+            border: 3px solid #2a3a8c;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1em;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #2a3a8c;
+        }
+
+        button.btn-export:hover {
+            background-color: #2a3a8c;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #2a3a8c;
+        }
+
+        button.btn-export:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Mensagem de Salvar */
+        .save-msg {
+            text-align: center;
+            color: #2e7d32;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .save-msg.show {
+            opacity: 1;
+        }
+
+        /* Responsividade para Celulares */
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+            .pokedex-container::before { width: 20px; height: 20px; left: 10px; top: 10px;}
+            h1.pokedex-title { font-size: 1.5em; margin-top: 40px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Ficha de Treinador Pokémon</h1>
+<div class="pokedex-container">
+    <h1 class="pokedex-title">PokéSheet RPG</h1>
     
-    <div class="grid">
-        <div>
-            <label>Nome do Treinador:</label>
-            <input type="text" id="trainerName" class="save">
-        </div>
-        <div>
-            <label>Classe/Ocupação:</label>
-            <input type="text" id="trainerClass" class="save">
-        </div>
-        <div>
-            <label>Região de Origem:</label>
-            <input type="text" id="region" class="save">
-        </div>
-        <div>
-            <label>Dinheiro (PokéDollars):</label>
-            <input type="number" id="money" class="save">
-        </div>
-    </div>
-
-    <hr>
-
-    <h2>Equipe Pokémon</h2>
-    <div id="pokemonTeam">
-        <div class="pokemon-card">
-            <h3>Pokémon #1</h3>
+    <div class="screen-panel">
+        <fieldset>
+            <legend>Informações do Treinador</legend>
             <div class="grid">
-                <input type="text" placeholder="Espécie" class="save" id="p1-species">
-                <input type="text" placeholder="Apelido" class="save" id="p1-nick">
-                <input type="number" placeholder="Nível" class="save" id="p1-lvl">
-                <input type="text" placeholder="Nature" class="save" id="p1-nature">
+                <div>
+                    <label>Nome do Treinador:</label>
+                    <input type="text" id="trainerName" class="save" placeholder="Ex: Ash Ketchum">
+                </div>
+                <div>
+                    <label>Classe/Ocupação:</label>
+                    <input type="text" id="trainerClass" class="save" placeholder="Ex: Criador, Coletor">
+                </div>
+                <div>
+                    <label>Região de Origem:</label>
+                    <input type="text" id="region" class="save" placeholder="Ex: Kanto">
+                </div>
+                <div>
+                    <label>Dinheiro (PokéDollars):</label>
+                    <input type="number" id="money" class="save" placeholder="1000">
+                </div>
             </div>
-            <textarea placeholder="Ataques e Habilidades..." rows="2" class="save" id="p1-moves"></textarea>
+        </fieldset>
+
+        <fieldset>
+            <legend>Sua Equipe Pokémon</legend>
+            <div class="pokemon-team" id="pokemonTeam">
+                <div class="pokemon-card">
+                    <h3>Pokémon #1</h3>
+                    <div class="grid">
+                        <input type="text" placeholder="Espécie" class="save" id="p1-species">
+                        <input type="text" placeholder="Apelido" class="save" id="p1-nick">
+                        <input type="number" placeholder="Nível" class="save" id="p1-lvl" min="1" max="100">
+                        <input type="text" placeholder="Nature" class="save" id="p1-nature">
+                    </div>
+                    <textarea placeholder="Ataques e Habilidades principais..." rows="3" class="save" id="p1-moves" style="margin-top:10px; resize: none;"></textarea>
+                </div>
+                
+                <div class="pokemon-card">
+                    <h3>Pokémon #2</h3>
+                    <div class="grid">
+                        <input type="text" placeholder="Espécie" class="save" id="p2-species">
+                        <input type="text" placeholder="Apelido" class="save" id="p2-nick">
+                        <input type="number" placeholder="Nível" class="save" id="p2-lvl" min="1" max="100">
+                        <input type="text" placeholder="Nature" class="save" id="p2-nature">
+                    </div>
+                    <textarea placeholder="Ataques e Habilidades..." rows="3" class="save" id="p2-moves" style="margin-top:10px; resize: none;"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Inventário e Notas de Aventura</legend>
+            <textarea id="notes" rows="6" class="save" placeholder="Anote seus itens, insígnias e descobertas..." style="resize: vertical;"></textarea>
+        </fieldset>
+
+        <div class="button-group">
+            <button onclick="exportData()" class="btn-export">Exportar Ficha (.json)</button>
+            <div class="save-msg" id="saveMsg">✔ Dados Salvos!</div>
         </div>
-    </div>
-
-    <label>Inventário / Notas:</label>
-    <textarea id="notes" rows="5" class="save"></textarea>
-
-    <div style="text-align: center; margin-top: 20px;">
-        <button onclick="exportData()">Baixar Ficha (.json)</button>
-        <p class="save-msg" id="msg">Dados salvos automaticamente!</p>
     </div>
 </div>
 
 <script>
-    // Salva automaticamente enquanto digita
+    // Sistema de Salvamento Automático e Carregamento (LocalStorage)
     const inputs = document.querySelectorAll('.save');
+    const saveMsg = document.getElementById('saveMsg');
+    let saveTimeout;
+
+    // Carrega dados ao abrir a página
+    window.addEventListener('load', () => {
+        inputs.forEach(input => {
+            const savedValue = localStorage.getItem(input.id);
+            if (savedValue) {
+                input.value = savedValue;
+            }
+        });
+    });
+
+    // Escuta mudanças nos inputs para salvar
     inputs.forEach(input => {
         input.addEventListener('input', () => {
             localStorage.setItem(input.id, input.value);
-            showMsg();
+            
+            // Mostra a mensagem de "Salvo" temporariamente
+            clearTimeout(saveTimeout);
+            saveMsg.classList.add('show');
+            saveTimeout = setTimeout(() => {
+                saveMsg.classList.remove('show');
+            }, 1000); // Esconde após 1 segundo
         });
-        // Carrega dados ao abrir
-        const savedValue = localStorage.getItem(input.id);
-        if (savedValue) input.value = savedValue;
     });
 
-    function showMsg() {
-        const msg = document.getElementById('msg');
-        msg.style.display = 'block';
-        setTimeout(() => msg.style.display = 'none', 1000);
-    }
-
+    // Função para exportar a ficha como arquivo JSON
     function exportData() {
         const data = {};
-        inputs.forEach(input => data[input.id] = input.value);
-        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        inputs.forEach(input => {
+            data[input.id] = input.value;
+        });
+        
+        const jsonData = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonData], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'ficha_pokemon.json';
+        a.href = url;
+        a.download = 'minha_pokesheet.json';
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 </script>
 
