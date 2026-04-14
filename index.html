@@ -3,208 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokéSheet Pro — Elite Trainer Interface</title>
+    <title>PokéSheet Cloud Pro v6.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
         :root {
-            --bg-deep: #080a12;
-            --bg-panel: rgba(22, 28, 45, 0.7);
-            --primary: #ff4757;
-            --secondary: #3e82ff;
-            --accent: #00d2d3;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg: #05070a;
+            --panel: rgba(22, 30, 45, 0.7);
+            --primary: #ff4d4d;
+            --primary-glow: rgba(255, 77, 77, 0.3);
+            --secondary: #4d8cff;
+            --accent: #00f2ad;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
             --border: rgba(255, 255, 255, 0.08);
-            --glass: blur(12px);
+            --input-bg: rgba(0, 0, 0, 0.3);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top right, #1e293b, #080a12);
-            color: var(--text-main); 
-            padding: 20px; 
-            min-height: 100vh;
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.2s ease; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #0f172a, #05070a);
+            color: var(--text-main);
+            padding: 20px;
             line-height: 1.5;
+            min-height: 100vh;
         }
 
         .container { max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 30px; }
 
-        /* Auth Bar Modernizada */
-        .auth-bar { 
-            background: var(--bg-panel);
-            backdrop-filter: var(--glass);
-            padding: 15px 30px; 
-            border-radius: 20px; 
-            display: flex; 
-            align-items: center; 
-            border: 1px solid var(--border); 
+        /* Auth Bar Moderna */
+        .auth-bar {
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+            padding: 15px 25px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
             justify-content: space-between;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        
-        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; background: linear-gradient(90deg, var(--primary), #ff6b81); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.2rem;
+            background: linear-gradient(90deg, var(--primary), #ff8080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
 
         .auth-inputs { display: flex; gap: 12px; }
-        .auth-inputs input { 
-            background: rgba(0,0,0,0.3); 
-            border: 1px solid var(--border); 
-            color: white; 
-            padding: 10px 15px; 
-            border-radius: 12px; 
+        .auth-inputs input {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 12px;
             width: 160px;
             font-size: 0.85rem;
-            transition: all 0.3s;
         }
-        .auth-inputs input:focus { border-color: var(--secondary); outline: none; background: rgba(0,0,0,0.5); }
 
         /* Seções */
-        .section-header { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            margin-bottom: 5px;
-        }
-        .section-header h2 { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
-        .line { height: 1px; flex: 1; background: var(--border); }
-
-        .panel { 
-            background: var(--bg-panel); 
-            backdrop-filter: var(--glass);
-            border: 1px solid var(--border); 
-            border-radius: 24px; 
-            padding: 30px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: -10px;
         }
 
-        /* Avatar */
-        .header-top { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
-        .avatar-wrapper { position: relative; }
-        .avatar-box { 
-            width: 160px; height: 160px; 
-            background: #111827; 
-            border: 3px solid var(--border); 
-            border-radius: 40px; 
-            overflow: hidden; 
-            cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
         }
-        .avatar-box:hover { transform: scale(1.02); border-color: var(--secondary); box-shadow: 0 0 20px rgba(62, 130, 255, 0.3); }
+
+        .section-line { height: 1px; flex: 1; background: var(--border); }
+
+        /* Painéis */
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Header do Treinador */
+        .header-top { display: flex; gap: 35px; flex-wrap: wrap; }
+
+        .avatar-container { position: relative; }
+        .avatar-box {
+            width: 160px;
+            height: 160px;
+            background: var(--input-bg);
+            border: 2px dashed var(--border);
+            border-radius: 30px;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .avatar-box:hover { border-color: var(--secondary); box-shadow: 0 0 20px rgba(77, 140, 255, 0.2); }
         .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Inputs Gerais */
-        .grid-header { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
-        .input-group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        
-        input, select, textarea { 
-            background: rgba(15, 23, 42, 0.6); 
-            border: 1px solid var(--border); 
-            color: #fff; 
-            padding: 14px; 
-            border-radius: 14px; 
-            font-size: 0.95rem; 
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--secondary); background: rgba(15, 23, 42, 0.9); box-shadow: 0 0 0 4px rgba(62, 130, 255, 0.1); outline: none; }
 
-        /* Pokémon Cards */
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
-        .pkmn-card { 
-            background: rgba(30, 41, 59, 0.5); 
-            border: 1px solid var(--border); 
-            border-radius: 24px; 
-            padding: 20px; 
-            display: flex; flex-direction: column; gap: 15px; 
-            transition: 0.3s;
+        .grid-header { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+
+        .field-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 0.7rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        input, select, textarea {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            width: 100%;
         }
-        .pkmn-card:hover { background: rgba(30, 41, 59, 0.8); transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
-        
-        .sprite-container { 
-            width: 80px; height: 80px; 
-            background: #0f172a; 
-            border-radius: 18px; 
-            display: flex; align-items: center; justify-content: center;
+
+        input:focus, select:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(77, 140, 255, 0.1);
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* Time Pokémon */
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+        .pkmn-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .pkmn-card:hover { border-color: rgba(255, 255, 255, 0.2); transform: translateY(-5px); }
+
+        .sprite-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #1a202c, #000);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid var(--border);
         }
-        .sprite-container img { width: 70px; height: 70px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
 
-        /* Inventário */
-        .inv-grid { display: grid; grid-template-columns: 1fr 280px; gap: 25px; }
-        .money-card { 
-            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); 
-            border-radius: 20px; 
-            padding: 25px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 1px solid rgba(16, 185, 129, 0.2);
+        .search-container { position: relative; flex: 1; }
+        .search-results {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: #1e293b;
+            border-radius: 12px;
+            z-index: 100;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        .money-card input { background: transparent; border: none; font-size: 2rem; text-align: center; font-weight: 800; color: #34d399; width: 100%; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .search-results div { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .search-results div:hover { background: var(--secondary); }
 
         /* Botões */
-        .btn { 
-            padding: 14px 24px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; 
-            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: all 0.3s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-blue { background: linear-gradient(135deg, #3e82ff 0%, #2563eb 100%); color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
-        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
-        .btn-convert { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; width: 100%; font-size: 0.9rem; margin-top: 20px; height: 55px; }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .btn:active { transform: translateY(0); }
-
-        /* Resultados */
-        #convert-result { 
-            display: none; margin-top: 25px; 
-            background: #020617; color: #10b981; 
-            font-family: 'Fira Code', monospace; padding: 25px; 
-            border-radius: 18px; border: 1px solid #1e293b; 
-            white-space: pre-wrap; font-size: 0.9rem; 
-            line-height: 1.6;
-            animation: fadeIn 0.5s ease;
+        .btn {
+            padding: 12px 24px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-blue { background: linear-gradient(135deg, #4d8cff, #3b71db); color: white; }
+        .btn-green { background: linear-gradient(135deg, #00f2ad, #00c48d); color: #05070a; }
+        .btn-convert {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 20px;
+            height: 55px;
+        }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* Inventário */
+        .inv-grid { display: grid; grid-template-columns: 1fr 240px; gap: 20px; }
+        .money-card {
+            background: linear-gradient(135deg, #064e3b, #022c22);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--accent);
+        }
+        .money-card input {
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            text-align: center;
+            width: 100%;
+        }
 
         /* Modal */
-        #crop-modal { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; 
-            backdrop-filter: blur(10px);
+        #crop-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .crop-container { width: 100%; max-width: 450px; height: 450px; background: #000; border-radius: 30px; overflow: hidden; border: 1px solid var(--border); }
+        .crop-area { width: 90%; max-width: 450px; height: 450px; background: #000; border-radius: 24px; overflow: hidden; }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-deep); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        #convert-result {
+            display: none;
+            margin-top: 25px;
+            background: rgba(0,0,0,0.4);
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+            padding: 25px;
+            border-radius: 18px;
+            border: 1px dashed var(--accent);
+            white-space: pre-wrap;
+        }
 
+        @media (max-width: 768px) {
+            .header-top { justify-content: center; }
+            .inv-grid { grid-template-columns: 1fr; }
+            .auth-bar { flex-direction: column; gap: 15px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="auth-bar">
-        <div class="logo">POKÉSHEET PRO</div>
+        <div class="logo-text">POKÉSHEET CLOUD PRO</div>
         <div class="auth-inputs">
-            <input type="text" id="user-id" placeholder="Usuário">
+            <input type="text" id="user-id" placeholder="Treinador">
             <input type="password" id="user-pass" placeholder="Senha">
-            <button class="btn btn-green" onclick="cloudAction('save')">Salvar</button>
-            <button class="btn btn-blue" onclick="cloudAction('load')">Entrar</button>
+            <button class="btn btn-green" onclick="cloudAction('save')">SALVAR</button>
+            <button class="btn btn-blue" onclick="cloudAction('load')">ENTRAR</button>
         </div>
     </div>
 
     <div class="section-header">
-        <h2>Ficha de Treinador</h2>
-        <div class="line"></div>
+        <div class="section-title">Ficha de Treinador</div>
+        <div class="section-line"></div>
     </div>
-    
+
     <div class="panel header-top">
-        <div class="avatar-wrapper">
+        <div class="avatar-container">
             <div onclick="document.getElementById('file-input').click()" class="avatar-box">
                 <img id="main-avatar" style="display:none">
                 <span id="placeholder">ADICIONAR FOTO</span>
@@ -213,11 +286,11 @@
         </div>
         
         <div class="grid-header">
-            <div class="input-group" style="grid-column: span 2;">
+            <div class="field-group" style="grid-column: span 2;">
                 <label>Nome do Treinador</label>
-                <input type="text" id="t-name" class="save" placeholder="Ex: Red Ketchum">
+                <input type="text" id="t-name" class="save" placeholder="Ex: Red">
             </div>
-            <div class="input-group">
+            <div class="field-group">
                 <label>Sexo</label>
                 <select id="t-sex" class="save">
                     <option value="">Escolher...</option>
@@ -226,15 +299,15 @@
                     <option value="Outro">Outro</option>
                 </select>
             </div>
-            <div class="input-group">
+            <div class="field-group">
                 <label>Idade <span style="color:var(--primary)">• Mín. 10</span></label>
                 <input type="number" id="t-age" class="save" min="10" placeholder="10">
             </div>
-            <div class="input-group">
+            <div class="field-group">
                 <label>Altura</label>
-                <input type="text" id="t-height" class="save" placeholder="1.70m">
+                <input type="text" id="t-height" class="save" placeholder="1,70m">
             </div>
-            <div class="input-group">
+            <div class="field-group">
                 <label>Classe</label>
                 <select id="t-class" class="save">
                     <option value="Treinador">Treinador</option>
@@ -245,56 +318,60 @@
                     <option value="Rocket">Equipe Rocket</option>
                 </select>
             </div>
-            <div class="input-group">
-                <label>Região</label>
+            <div class="field-group">
+                <label>Região de Origem</label>
                 <select id="t-region" class="save" onchange="updateCities()"></select>
             </div>
-            <div class="input-group">
-                <label>Cidade</label>
+            <div class="field-group">
+                <label>Cidade Natal</label>
                 <select id="t-city" class="save"></select>
             </div>
-            <div class="input-group" style="grid-column: span 3;">
-                <label>Aparência (Descrição Visual ou Fonte)</label>
-                <input type="text" id="t-appearance" class="save" placeholder="Ex: Trajes de Galar, olhos castanhos...">
+            <div class="field-group" style="grid-column: span 3;">
+                <label>Aparência (Descrição Visual ou Créditos da Arte)</label>
+                <input type="text" id="t-appearance" class="save" placeholder="Descreva traços marcantes ou de onde veio o avatar...">
             </div>
         </div>
     </div>
 
     <div class="section-header">
-        <h2>Equipe Pokémon</h2>
-        <div class="line"></div>
+        <div class="section-title">Equipe Pokémon</div>
+        <div class="section-line"></div>
     </div>
     <div id="team" class="team-grid"></div>
 
     <div class="section-header">
-        <h2>Inventário & Recursos</h2>
-        <div class="line"></div>
+        <div class="section-title">Inventário & Recursos</div>
+        <div class="section-line"></div>
     </div>
     <div class="panel inv-grid">
-        <div class="input-group">
-            <label>Bolsa de Itens</label>
-            <textarea id="t-bag" class="save" rows="6" placeholder="Pocão x5&#10;Pokébola x10&#10;Mapa de Região..."></textarea>
+        <div class="field-group">
+            <label>Bolsa (Itens e Equipamentos)</label>
+            <textarea id="t-bag" class="save" rows="6" placeholder="• 5x Pokéball&#10;• 2x Potion&#10;• Mapa de Kanto..."></textarea>
         </div>
         <div class="money-card">
-            <label>SALDO ATUAL</label>
-            <input type="text" id="t-money" class="save" value="0">
-            <span style="font-size: 0.7rem; color: #6ee7b7; margin-top: 10px; font-weight: 700;">MOEDA: POKÉDOLLAR (₽)</span>
+            <label style="color: #a7f3d0; margin-bottom: 10px;">SALDO ATUAL</label>
+            <div style="display:flex; align-items:center;">
+                <span style="font-size: 1.5rem; font-weight: 800; color: var(--accent); margin-right: 5px;">₽</span>
+                <input type="text" id="t-money" class="save" value="3000">
+            </div>
         </div>
     </div>
 
     <div class="panel">
-        <label>Anotações Adicionais</label>
-        <textarea id="notes" class="save" rows="3" placeholder="Insígnias, conquistas ou história..."></textarea>
-        <button class="btn btn-convert" onclick="convertSheet()">Gerar Ficha Textual para RPG</button>
+        <div class="field-group">
+            <label>Diário de Viagem</label>
+            <textarea id="notes" class="save" rows="3" placeholder="Anotações extras sobre sua jornada..."></textarea>
+        </div>
+        <button class="btn btn-convert" onclick="convertSheet()">Gerar Ficha para Copiar ✨</button>
         <div id="convert-result"></div>
     </div>
 </div>
 
 <div id="crop-modal">
-    <div class="crop-container"><img id="image-to-crop"></div>
+    <div class="crop-area"><img id="image-to-crop"></div>
     <div style="margin-top:30px; display:flex; gap:15px;">
-        <button class="btn" style="background:rgba(255,255,255,0.1); color: white;" onclick="document.getElementById('crop-modal').style.display='none'">CANCELAR</button>
-        <button class="btn btn-green" onclick="finishCrop()">CORTAR E SALVAR</button>
+        <button class="btn" style="background:#334155" onclick="document.getElementById('crop-modal').style.display='none'">CANCELAR</button>
+        <button class="btn btn-green" onclick="finishCrop()">FINALIZAR CORTE</button>
     </div>
 </div>
 
@@ -330,12 +407,13 @@
         const regSelect = document.getElementById('t-region');
         regSelect.innerHTML = '<option value="">Região...</option>';
         Object.keys(worldData).forEach(r => regSelect.innerHTML += `<option value="${r}">${r}</option>`);
+        
         renderSlots();
         try {
             const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
             const d = await r.json();
             allPkmn = d.results;
-        } catch(e) { console.error("API Error"); }
+        } catch(e) { console.error("API error"); }
     }
 
     function renderSlots() {
@@ -344,10 +422,10 @@
             team.innerHTML += `
             <div class="pkmn-card">
                 <div style="display:flex; gap:15px; align-items:center;">
-                    <div class="sprite-container"><img id="img-${i}" style="display:none"></div>
+                    <div class="sprite-box"><img id="img-${i}" style="display:none; width:70px;"></div>
                     <div class="search-container">
                         <label>Pokémon #${i}</label>
-                        <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie...">
+                        <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Nome da espécie...">
                         <div id="drop-${i}" class="search-results"></div>
                     </div>
                 </div>
@@ -391,15 +469,4 @@
         document.getElementById(`p${slot}-name`).value = format(name);
         document.getElementById(`drop-${slot}`).style.display = "none";
         try {
-            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-            const d = await r.json();
-            document.getElementById(`img-${slot}`).src = d.sprites.front_default;
-            document.getElementById(`img-${slot}`).style.display = "block";
-            moveCache[slot] = d.moves;
-            updateMoves(slot, restoreData);
-        } catch(e) {}
-    }
-
-    function updateMoves(slot, restoreData = null) {
-        const moves = moveCache[slot]; if(!moves) return;
-        const lvl = parseInt(doc
+            const r = 
