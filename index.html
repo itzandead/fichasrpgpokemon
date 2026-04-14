@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokéSheet Cloud Ultra - Advanced Edition</title>
+    <title>Pokémon: Aurélia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
@@ -23,13 +24,42 @@
         body { background: radial-gradient(circle at top right, #111827, #05080f); color: var(--text); padding: 15px; min-height: 100vh; }
         .container { max-width: 1100px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
 
+        /* Auth Bar & Custom Title */
         .auth-bar { background: var(--surface); backdrop-filter: blur(15px); padding: 18px 25px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); flex-wrap: wrap; gap: 15px; }
-        .logo { font-weight: 800; font-size: 1.3rem; letter-spacing: -1px; background: linear-gradient(to right, #ff3e3e, #f87171); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .logo-container { position: relative; display: inline-block; padding-right: 40px; }
+        .logo { 
+            font-family: 'Unbounded', cursive; 
+            font-weight: 900; 
+            font-size: 1.4rem; 
+            letter-spacing: -1px; 
+            color: #ffcb05;
+            text-shadow: 3px 3px 0px #3b4cca, -1px -1px 0px #3b4cca, 1px -1px 0px #3b4cca, -1px 1px 0px #3b4cca, 1px 1px 0px #3b4cca;
+            text-transform: uppercase;
+        }
+        .pikachu-climb {
+            position: absolute;
+            right: -5px;
+            top: -15px;
+            width: 50px;
+            height: 50px;
+            background: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif') no-repeat center;
+            background-size: contain;
+            animation: hang 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes hang {
+            0%, 100% { transform: translateY(0) rotate(5deg); }
+            50% { transform: translateY(5px) rotate(-5deg); }
+        }
+
         .auth-inputs { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .pass-container { position: relative; display: flex; align-items: center; }
         .pass-container input { padding-right: 35px; }
         .toggle-pass { position: absolute; right: 10px; cursor: pointer; opacity: 0.6; font-size: 0.8rem; }
 
+        /* Tabs Navigation */
         .tabs-nav { display: flex; gap: 10px; margin-bottom: -10px; }
         .tab-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 25px; border-radius: 15px 15px 0 0; cursor: pointer; font-weight: 700; transition: 0.3s; }
         .tab-btn.active { background: var(--secondary); color: white; border-bottom: none; }
@@ -54,6 +84,7 @@
 
         input, select, textarea { background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 12px; font-size: 0.85rem; width: 100%; }
 
+        /* Status & Pokemon Card */
         .stats-container { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
         .stat-row { display: grid; grid-template-columns: 80px 1fr 1fr 1fr; gap: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; }
         .stat-label { font-size: 0.7rem; font-weight: 800; color: var(--text-dim); }
@@ -68,7 +99,6 @@
         .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); image-rendering: pixelated; }
         
         .gimmick-badge { position: absolute; bottom: 5px; right: 5px; width: 28px; height: 28px; background-size: contain; background-repeat: no-repeat; background-position: center; pointer-events: none; z-index: 10; filter: drop-shadow(0 0 2px black); }
-
         .shiny-toggle { position: absolute; top: 5px; left: 5px; cursor: pointer; z-index: 15; font-size: 1.2rem; filter: grayscale(1); transition: 0.3s; }
         .shiny-toggle.active { filter: grayscale(0) drop-shadow(0 0 5px var(--shiny)); }
 
@@ -98,7 +128,10 @@
 
 <div class="container">
     <div class="auth-bar">
-        <div class="logo">POKÉSHEET CLOUD</div>
+        <div class="logo-container">
+            <div class="logo">Pokémon: Aurélia</div>
+            <div class="pikachu-climb"></div>
+        </div>
         <div class="auth-inputs">
             <input type="text" id="user-id" placeholder="ID">
             <div class="pass-container">
@@ -298,19 +331,12 @@
         const hiddenInput = document.getElementById(`p${slot}-is-shiny`);
         const btn = document.getElementById(`p${slot}-shiny-btn`);
         const isShiny = hiddenInput.value === 'true';
-        
         hiddenInput.value = !isShiny;
         btn.classList.toggle('active', !isShiny);
-        
-        // Atualizar imagem se houver pokemon carregado
         if (pkmnFullData[slot]) {
             const img = document.getElementById(`img-${slot}`);
             const data = pkmnFullData[slot];
-            if (!isShiny) {
-                img.src = data.sprites.other['official-artwork'].front_shiny || data.sprites.front_shiny;
-            } else {
-                img.src = data.sprites.other['official-artwork'].front_default || data.sprites.front_default;
-            }
+            img.src = !isShiny ? (data.sprites.other['official-artwork'].front_shiny || data.sprites.front_shiny) : (data.sprites.other['official-artwork'].front_default || data.sprites.front_default);
         }
     }
 
@@ -318,29 +344,21 @@
         const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 1;
         const natureVal = document.getElementById(`p${slot}-nature`).value;
         const nature = natures[natureVal] || {plus: null, minus: null};
-        
         const totalPoints = (lvl - 1) * 5;
         let usedPoints = 0;
-        const stats = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-        
-        stats.forEach(s => {
+        ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].forEach(s => {
             const base = parseInt(document.getElementById(`p${slot}-base-${s}`).value) || 0;
             const up = parseInt(document.getElementById(`p${slot}-up-${s}`).value) || 0;
             usedPoints += up;
-
             let multiplier = 1.0;
             if(nature.plus === s) multiplier += 0.10;
             if(nature.minus === s) multiplier -= 0.10;
-
-            const bonusExtra = Math.floor(up / 10) * 0.01;
-            multiplier += bonusExtra;
-
+            multiplier += (Math.floor(up / 10) * 0.01);
             const total = Math.floor((base + up) * multiplier);
             const display = document.getElementById(`p${slot}-total-${s}`);
             display.innerText = total;
             display.style.color = multiplier > 1 ? '#10b981' : (multiplier < 1 ? '#ff3e3e' : '#f1f5f9');
         });
-
         const ptsSpan = document.getElementById(`p${slot}-pts`);
         ptsSpan.innerText = totalPoints - usedPoints;
         ptsSpan.style.color = (totalPoints - usedPoints) < 0 ? '#ff3e3e' : '#10b981';
@@ -353,7 +371,6 @@
             badge.style.backgroundImage = `url('${gimmicks[val]}')`;
             badge.style.display = 'block';
         } else {
-            badge.style.backgroundImage = 'none';
             badge.style.display = 'none';
         }
     }
@@ -389,26 +406,15 @@
             const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
             const d = await r.json();
             pkmnFullData[slot] = d;
-            
             const img = document.getElementById(`img-${slot}`);
             const isShiny = document.getElementById(`p${slot}-is-shiny`).value === 'true';
-            
-            if (isShiny) {
-                img.src = d.sprites.other['official-artwork'].front_shiny || d.sprites.front_shiny;
-            } else {
-                img.src = d.sprites.other['official-artwork'].front_default || d.sprites.front_default;
-            }
+            img.src = isShiny ? (d.sprites.other['official-artwork'].front_shiny || d.sprites.front_shiny) : (d.sprites.other['official-artwork'].front_default || d.sprites.front_default);
             img.style.display = "block";
-            
-            // Habilidades
             const abSelect = document.getElementById(`p${slot}-ability`);
             const curAb = abSelect.value;
             abSelect.innerHTML = '<option value="">Habilidade</option>';
-            d.abilities.forEach(a => {
-                abSelect.innerHTML += `<option value="${format(a.ability.name)}">${format(a.ability.name)}</option>`;
-            });
+            d.abilities.forEach(a => abSelect.innerHTML += `<option value="${format(a.ability.name)}">${format(a.ability.name)}</option>`);
             if (restoreData) abSelect.value = restoreData[`p${slot}-ability`]; else abSelect.value = curAb;
-
             if(!restoreData) {
                 d.stats.forEach((s, idx) => {
                     const map = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
@@ -416,7 +422,6 @@
                 });
                 calcStats(slot);
             }
-
             moveCache[slot] = d.moves;
             updateMoves(slot, restoreData);
         } catch(e) {}
@@ -439,27 +444,21 @@
         const d = (id) => document.getElementById(id).value || "---";
         const bagLines = document.getElementById('t-bag').value.split('\n').filter(l => l.trim() !== "");
         let bagText = "";
-        const linesToRender = Math.max(3, bagLines.length);
-        for(let i=0; i < linesToRender; i++) { bagText += `╰┈➤ ${bagLines[i] || ""}\n`; }
+        for(let i=0; i < Math.max(3, bagLines.length); i++) { bagText += `╰┈➤ ${bagLines[i] || ""}\n`; }
         let pkmnText = "";
         for(let i=1; i<=6; i++) {
             const pName = document.getElementById(`p${i}-name`).value;
             const pNick = document.getElementById(`p${i}-nick`).value;
-            const pLvl = document.getElementById(`p${i}-lvl`).value;
             const isShiny = document.getElementById(`p${i}-is-shiny`).value === 'true';
-            
             if(pName) {
                 let pStr = pNick ? `${pNick} (${pName})` : pName;
                 if(isShiny) pStr += " ✨";
-                pkmnText += `╰┈➤ ${pStr} (Lv. ${pLvl})\n`;
-            } else {
-                pkmnText += `╰┈➤ Vazio\n`;
-            }
+                pkmnText += `╰┈➤ ${pStr} (Lv. ${document.getElementById(`p${i}-lvl`).value})\n`;
+            } else pkmnText += `╰┈➤ Vazio\n`;
         }
         const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎\n- Nome: ${d('t-name')}\n- Sexo: ${d('t-sex')}\n- Idade: ${d('t-age')}\n- Altura: ${d('t-height')}\n- Dinheiro: ₽ ${d('t-money')}\n\n━━━━❰BOLSA❱━━━━\n${bagText}\n━━━━▣━━◤POKÉMONS◢━━▣━━━━━\n${pkmnText}`;
         const res = document.getElementById('convert-result');
         res.innerText = template; res.style.display = 'block';
-        alert("Convertido!");
     }
 
     async function cloudAction(type) {
@@ -476,7 +475,6 @@
                 Object.keys(data.data).forEach(id => { 
                     const el = document.getElementById(id); 
                     if(el) el.value = data.data[id];
-                    // Sync shiny UI
                     if(id.includes('is-shiny')) {
                         const slot = id.split('-')[0].replace('p', '');
                         document.getElementById(`p${slot}-shiny-btn`).classList.toggle('active', data.data[id] === 'true');
