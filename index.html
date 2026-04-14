@@ -34,6 +34,8 @@
             animation: slideIn 0.3s ease-out forwards; border-left: 4px solid var(--secondary);
         }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast.success { border-left-color: var(--accent); }
+        .toast.error { border-left-color: var(--primary); }
 
         .auth-bar { background: var(--surface); backdrop-filter: blur(15px); padding: 18px 25px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); flex-wrap: wrap; gap: 15px; }
         
@@ -88,18 +90,17 @@
         input, select, textarea { background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 12px; font-size: 0.85rem; width: 100%; transition: 0.3s; }
         input:focus { border-color: var(--secondary); outline: none; background: rgba(0,0,0,0.4); }
 
-        /* MOCHILA DINÂMICA */
+        /* MOCHILA DESIGN DINÂMICO */
         .bag-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
         .bag-sprite { 
             width: 50px; 
             height: 45px; 
             background-image: url('https://i.ibb.co/SwH03wrc/Pt-bag.png');
             background-repeat: no-repeat;
-            background-size: 100px 45px; /* Proporção da imagem original */
+            background-size: 100px 45px; 
             image-rendering: pixelated;
             transition: background-position 0.2s steps(1);
         }
-        /* Posições: Masculina (Esquerda 0px) | Feminina (Direita -50px) */
         .bag-male { background-position: 0px 0px; }
         .bag-female { background-position: -50px 0px; }
 
@@ -110,9 +111,15 @@
             border-radius: 16px; padding: 12px 18px; display: flex; align-items: center; gap: 15px;
             width: fit-content; min-width: 200px; margin-top: 15px;
         }
-        .money-symbol { font-family: 'Unbounded'; font-size: 1.5rem; color: var(--money); text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+        .money-symbol { 
+            font-family: 'Unbounded'; font-size: 1.5rem; color: var(--money); 
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
         .money-input-wrapper { flex: 1; }
-        .money-input-wrapper input { background: transparent; border: none; padding: 0; font-size: 1.2rem; font-weight: 800; color: var(--money); width: 100%; }
+        .money-input-wrapper input { 
+            background: transparent; border: none; padding: 0; font-size: 1.2rem; 
+            font-weight: 800; color: var(--money); width: 100%; 
+        }
 
         .stats-container { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
         .stat-row { display: grid; grid-template-columns: 80px 1fr 1fr 1fr; gap: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; }
@@ -144,6 +151,7 @@
 
         #crop-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .crop-wrap { width: 90vw; height: 90vw; max-width: 400px; max-height: 400px; background: #111; border-radius: 10px; overflow: hidden; }
+        .cropper-view-box, .cropper-face { border-radius: 50%; }
 
         @media (min-width: 768px) {
             .trainer-header { flex-direction: row; align-items: center; }
@@ -151,6 +159,8 @@
             .team-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (min-width: 1024px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        #convert-result { display: none; margin-top: 15px; background: #000; color: var(--accent); padding: 15px; border-radius: 12px; border: 1px dashed var(--accent); font-family: monospace; white-space: pre-wrap; font-size: 0.8rem; overflow-x: auto; }
     </style>
 </head>
 <body>
@@ -221,7 +231,7 @@
         </div>
         
         <button class="btn btn-convert" onclick="convertSheet()">✨ GERAR FICHA EM TEXTO</button>
-        <div id="convert-result" style="display:none; margin-top:15px; background:#000; color:var(--accent); padding:15px; border-radius:12px; border:1px dashed var(--accent); font-family:monospace; white-space:pre-wrap; font-size:0.8rem;"></div>
+        <div id="convert-result"></div>
     </div>
 
     <div id="tab-pokemon" class="tab-content">
@@ -253,9 +263,35 @@
     let moveCache = {};
     let cropper;
 
-    const natures = { 'Adamant': {plus:'atk', minus:'spa'}, 'Bold': {plus:'def', minus:'atk'}, 'Jolly': {plus:'spe', minus:'spa'}, 'Modest': {plus:'spa', minus:'atk'}, 'Timid': {plus:'spe', minus:'atk'} /* ...outras natures... */ };
-    const gimmicks = { "Mega": "https://i.ibb.co/3510nxGs/key-stone-by-jormxdos-dfftdg1-414w.png", "Z-Move": "https://i.ibb.co/0RCRx7VG/z-ring-icon-by-jormxdos-dffutkv-fullview.png", "Dynamax": "https://i.ibb.co/K1t5pYy/gigantamax-icon-by-jormxdos-dffv4gc-fullview.png", "Tera": "https://i.ibb.co/4ZzfQZ5c/terastal-phenomenon-icon-by-jormxdos-dffvs1r-fullview.png" };
-    const worldData = { "Kanto": ["Pallet Town", "Cerulean City"], "Paldea": ["Mesagoza", "Levincia"] /* ...outras regiões... */ };
+    const natures = {
+        'Adamant': {plus: 'atk', minus: 'spa'}, 'Bold': {plus: 'def', minus: 'atk'}, 'Brave': {plus: 'atk', minus: 'spe'},
+        'Calm': {plus: 'spd', minus: 'atk'}, 'Careful': {plus: 'spd', minus: 'spa'}, 'Gentle': {plus: 'spd', minus: 'def'},
+        'Hasty': {plus: 'spe', minus: 'def'}, 'Impish': {plus: 'def', minus: 'spa'}, 'Jolly': {plus: 'spe', minus: 'spa'},
+        'Lonely': {plus: 'atk', minus: 'def'}, 'Mild': {plus: 'spa', minus: 'def'}, 'Modest': {plus: 'spa', minus: 'atk'},
+        'Naive': {plus: 'spe', minus: 'spd'}, 'Naughty': {plus: 'atk', minus: 'spd'}, 'Quiet': {plus: 'spa', minus: 'spe'},
+        'Rash': {plus: 'spa', minus: 'spd'}, 'Relaxed': {plus: 'def', minus: 'spe'}, 'Sassy': {plus: 'spd', minus: 'spe'},
+        'Timid': {plus: 'spe', minus: 'atk'}, 'Hardy': {plus: null, minus: null}, 'Docile': {plus: null, minus: null},
+        'Serious': {plus: null, minus: null}, 'Bashful': {plus: null, minus: null}, 'Quirky': {plus: null, minus: null}
+    };
+
+    const gimmicks = {
+        "Mega": "https://i.ibb.co/3510nxGs/key-stone-by-jormxdos-dfftdg1-414w.png",
+        "Z-Move": "https://i.ibb.co/0RCRx7VG/z-ring-icon-by-jormxdos-dffutkv-fullview.png",
+        "Dynamax": "https://i.ibb.co/K1t5pYy/gigantamax-icon-by-jormxdos-dffv4gc-fullview.png",
+        "Tera": "https://i.ibb.co/4ZzfQZ5c/terastal-phenomenon-icon-by-jormxdos-dffvs1r-fullview.png"
+    };
+
+    const worldData = {
+        "Kanto": ["Pallet Town", "Viridian City", "Pewter City", "Cerulean City", "Vermilion City", "Lavender Town", "Celadon City", "Fuchsia City", "Saffron City", "Cinnabar Island"],
+        "Johto": ["New Bark Town", "Cherrygrove City", "Violet City", "Azalea Town", "Goldenrod City", "Ecruteak City", "Olivine City", "Cianwood City", "Mahogany Town", "Blackthorn City"],
+        "Hoenn": ["Littleroot Town", "Oldale Town", "Petalburg City", "Rustboro City", "Dewford Town", "Slateport City", "Mauville City", "Verdanturf Town", "Fallarbor Town", "Lavaridge Town", "Fortree City", "Lilycove City", "Mossdeep City", "Sootopolis City"],
+        "Sinnoh": ["Twinleaf Town", "Sandgem Town", "Jubilife City", "Oreburgh City", "Floaroma Town", "Eterna City", "Hearthome City", "Solaceon Town", "Veilstone City", "Pastoria City", "Celestic Town", "Canalave City", "Snowpoint City", "Sunyshore City"],
+        "Unova": ["Nuvema Town", "Accumula Town", "Striaton City", "Nacrene City", "Castelia City", "Nimbasa City", "Driftveil City", "Mistralton City", "Icirrus City", "Opelucid City", "Humilau City"],
+        "Kalos": ["Vaniville Town", "Santalune City", "Lumiose City", "Camphrier Town", "Cyllage City", "Ambrette Town", "Shalour City", "Coumarine City", "Laverre City", "Dendemille Town", "Anistar City", "Snowbelle City"],
+        "Alola": ["Hau'oli City", "Heahea City", "Konikoni City", "Malie City", "Tapu Village", "Seafolk Village"],
+        "Galar": ["Postwick", "Wedgehurst", "Motostoke", "Turffield", "Hulbury", "Hammerlocke", "Stow-on-Side", "Ballonlea", "Circhester", "Spikemuth", "Wyndon"],
+        "Paldea": ["Cabo Poco", "Mesagoza", "Cortondo", "Artazon", "Levincia", "Cascarrafa", "Porto Marinada", "Medali", "Montenevera", "Alfornada", "Glaseado"]
+    };
 
     function format(str) { return str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
 
@@ -268,16 +304,20 @@
         setTimeout(() => { toast.style.animation = "slideIn 0.3s ease-in reverse forwards"; setTimeout(() => toast.remove(), 300); }, 3000);
     }
 
-    function togglePassword() { const pass = document.getElementById('user-pass'); pass.type = pass.type === 'password' ? 'text' : 'password'; }
+    function togglePassword() {
+        const pass = document.getElementById('user-pass');
+        pass.type = pass.type === 'password' ? 'text' : 'password';
+    }
 
     function openTab(id, btn) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         btn.classList.add('active');
-        if(id === 'tab-trainer') updateBagIcon(); // Atualiza ícone ao voltar para a aba
+        if(id === 'tab-trainer') updateBagIcon(); 
     }
 
+    /* FUNÇÃO DA MOCHILA DINÂMICA */
     function updateBagIcon() {
         const sex = document.getElementById('t-sex').value;
         const icon = document.getElementById('bag-icon-display');
@@ -288,11 +328,10 @@
         } else if (sex === "Feminino") {
             icon.classList.add('bag-female');
         } else if (sex === "Outro") {
-            // Escolha aleatória para "Outro"
             const randomClass = Math.random() > 0.5 ? 'bag-male' : 'bag-female';
             icon.classList.add(randomClass);
         } else {
-            icon.classList.add('bag-male'); // Padrão
+            icon.classList.add('bag-male');
         }
     }
 
@@ -303,7 +342,10 @@
         renderSlots();
         updateBagIcon();
         try {
-            const [pr, ir] = await Promise.all([ fetch('https://pokeapi.co/api/v2/pokemon?limit=10000'), fetch('https://pokeapi.co/api/v2/item?limit=2000') ]);
+            const [pr, ir] = await Promise.all([
+                fetch('https://pokeapi.co/api/v2/pokemon?limit=10000'),
+                fetch('https://pokeapi.co/api/v2/item?limit=2000')
+            ]);
             allPkmn = (await pr.json()).results;
             allItems = (await ir.json()).results;
         } catch(e) {}
@@ -321,7 +363,7 @@
                     <div class="search-area"><label>Pokémon #${i}</label><input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie..."><div id="drop-${i}" class="results-box"></div></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
-                    <div class="input-group"><label>Apelido</label><input type="text" id="p${i}-nick" class="save"></div>
+                    <div class="input-group"><label>Apelido</label><input type="text" id="p${i}-nick" class="save" placeholder="Apelido..."></div>
                     <div class="input-group"><label>Habilidade</label><select id="p${i}-ability" class="save"><option value="">Habilidade</option></select></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
@@ -334,7 +376,7 @@
                 </div>
                 <div class="stats-container">
                     <div class="points-badge">Pontos Disponíveis: <span id="p${i}-pts">0</span></div>
-                    ${['hp', 'atk', 'def', 'spa', 'spd', 'spe'].map(s => `<div class="stat-row"><span class="stat-label">${s.toUpperCase()}</span><input type="number" id="p${i}-base-${s}" class="save" onchange="calcStats(${i})"><input type="number" id="p${i}-up-${s}" class="save" onchange="calcStats(${i})"><span id="p${i}-total-${s}" class="stat-val">0</span></div>`).join('')}
+                    ${['hp', 'atk', 'def', 'spa', 'spd', 'spe'].map(s => `<div class="stat-row"><span class="stat-label">${s.toUpperCase()}</span><input type="number" id="p${i}-base-${s}" class="save" placeholder="Base" onchange="calcStats(${i})"><input type="number" id="p${i}-up-${s}" class="save" placeholder="Add" onchange="calcStats(${i})"><span id="p${i}-total-${s}" class="stat-val">0</span></div>`).join('')}
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px">
                     <select id="p${i}-m1" class="save"></select><select id="p${i}-m2" class="save"></select>
@@ -343,9 +385,6 @@
             </div>`;
         }
     }
-
-    // ... (Funções selectPkmn, doSearch, calcStats, cloudAction etc. permanecem as mesmas das versões anteriores) ...
-    // Note: Re-adicione todas as funções de lógica de dados aqui para manter o funcionamento completo da ficha.
 
     function toggleShiny(slot) {
         const hiddenInput = document.getElementById(`p${slot}-is-shiny`);
@@ -363,14 +402,6 @@
         img.style.display = "block";
     }
 
-    function updateCities() {
-        const r = document.getElementById('t-region').value;
-        const s = document.getElementById('t-city');
-        const cur = s.value; s.innerHTML = '<option value="">Cidade...</option>';
-        if(worldData[r]) worldData[r].forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
-        if(cur) s.value = cur;
-    }
-
     function calcStats(slot) {
         const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 1;
         const nature = natures[document.getElementById(`p${slot}-nature`).value] || {plus: null, minus: null};
@@ -381,10 +412,106 @@
             used += up;
             let mult = 1.0;
             if(nature.plus === s) mult += 0.1; if(nature.minus === s) mult -= 0.1;
+            mult += (Math.floor(up / 10) * 0.01);
             const total = Math.floor((base + up) * mult);
-            document.getElementById(`p${slot}-total-${s}`).innerText = total;
+            const d = document.getElementById(`p${slot}-total-${s}`);
+            d.innerText = total; d.style.color = mult > 1 ? '#10b981' : (mult < 1 ? '#ff3e3e' : '#f1f5f9');
         });
-        document.getElementById(`p${slot}-pts`).innerText = ((lvl - 1) * 5) - used;
+        const pts = document.getElementById(`p${slot}-pts`);
+        pts.innerText = ((lvl - 1) * 5) - used;
+        pts.style.color = (parseInt(pts.innerText) < 0) ? '#ff3e3e' : '#10b981';
+    }
+
+    function updateGimmickIcon(slot) {
+        const val = document.getElementById(`p${slot}-gim`).value;
+        const b = document.getElementById(`gim-badge-${slot}`);
+        if(val && gimmicks[val]) { b.style.backgroundImage = `url('${gimmicks[val]}')`; b.style.display = 'block'; } else b.style.display = 'none';
+    }
+
+    function updateCities() {
+        const r = document.getElementById('t-region').value;
+        const s = document.getElementById('t-city');
+        const cur = s.value; s.innerHTML = '<option value="">Cidade...</option>';
+        if(worldData[r]) worldData[r].forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+        if(cur) s.value = cur;
+    }
+
+    function doSearch(slot) {
+        const q = document.getElementById(`p${slot}-name`).value.toLowerCase().replace(/ /g, '-');
+        const drop = document.getElementById(`drop-${slot}`); drop.innerHTML = "";
+        if(q.length < 2) return drop.style.display="none";
+        const hits = allPkmn.filter(p => p.name.includes(q)).slice(0, 10);
+        if(hits.length) {
+            drop.style.display="block";
+            hits.forEach(p => {
+                const id = p.url.split('/')[6];
+                const d = document.createElement('div');
+                d.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png"> <span>${format(p.name)}</span>`;
+                d.onclick = () => selectPkmn(slot, p.name);
+                drop.appendChild(d);
+            });
+        }
+    }
+
+    function doItemSearch(slot) {
+        const q = document.getElementById(`p${slot}-item`).value.toLowerCase().replace(/ /g, '-');
+        const drop = document.getElementById(`drop-item-${slot}`); drop.innerHTML = "";
+        if(q.length < 2) return drop.style.display="none";
+        const hits = allItems.filter(i => i.name.includes(q)).slice(0, 10);
+        if(hits.length) {
+            drop.style.display="block";
+            hits.forEach(item => {
+                const d = document.createElement('div');
+                d.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item.name}.png" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'"> <span>${format(item.name)}</span>`;
+                d.onclick = () => { document.getElementById(`p${slot}-item`).value = format(item.name); drop.style.display = "none"; };
+                drop.appendChild(d);
+            });
+        }
+    }
+
+    async function selectPkmn(slot, name, restoreData = null) {
+        document.getElementById(`p${slot}-name`).value = format(name);
+        document.getElementById(`drop-${slot}`).style.display = "none";
+        try {
+            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+            const d = await r.json();
+            pkmnFullData[slot] = d;
+            updatePkmnImage(slot, d, document.getElementById(`p${slot}-is-shiny`).value === 'true');
+            const ab = document.getElementById(`p${slot}-ability`);
+            ab.innerHTML = '<option value="">Habilidade</option>';
+            d.abilities.forEach(a => ab.innerHTML += `<option value="${format(a.ability.name)}">${format(a.ability.name)}</option>`);
+            if (restoreData) ab.value = restoreData[`p${slot}-ability`];
+            if(!restoreData) { d.stats.forEach((s, idx) => { const map = ['hp', 'atk', 'def', 'spa', 'spd', 'spe']; document.getElementById(`p${slot}-base-${map[idx]}`).value = s.base_stat; }); calcStats(slot); }
+            moveCache[slot] = d.moves; updateMoves(slot, restoreData);
+        } catch(e) {}
+    }
+
+    function updateMoves(slot, restoreData = null) {
+        const moves = moveCache[slot]; if(!moves) return;
+        const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 1;
+        const avail = moves.filter(m => m.version_group_details.some(vd => vd.move_learn_method.name === 'level-up' && vd.level_learned_at <= lvl)).map(m => m.move.name);
+        const unique = [...new Set(avail)].map(format).sort();
+        for(let i=1; i<=4; i++) {
+            const s = document.getElementById(`p${slot}-m${i}`);
+            const cur = s.value; s.innerHTML = '<option value="">Golpe</option>';
+            unique.forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
+            if(restoreData) s.value = restoreData[`p${slot}-m${i}`]; else s.value = cur;
+        }
+    }
+
+    function convertSheet() {
+        const d = (id) => document.getElementById(id).value || "---";
+        const bagLines = document.getElementById('t-bag').value.split('\n').filter(l => l.trim() !== "");
+        let bagText = ""; bagLines.forEach(l => bagText += `╰┈➤ ${l}\n`);
+        let pkmnText = "";
+        for(let i=1; i<=6; i++) {
+            const pName = document.getElementById(`p${i}-name`).value;
+            if(pName) pkmnText += `╰┈➤ ${document.getElementById(`p${i}-nick`).value || pName} (Lv. ${document.getElementById(`p${i}-lvl`).value})${document.getElementById(`p${i}-is-shiny`).value === 'true' ? ' ✨' : ''}\n`;
+            else pkmnText += `╰┈➤ Vazio\n`;
+        }
+        const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎\n- Nome: ${d('t-name')}\n- Região: ${d('t-region')} (${d('t-city')})\n- Dinheiro: ₽ ${d('t-money')}\n\n━━━━❰MOCHILA❱━━━━\n${bagText}\n━━━━▣━━◤POKÉMONS◢━━▣━━━━━\n${pkmnText}`;
+        const res = document.getElementById('convert-result');
+        res.innerText = template; res.style.display = 'block';
     }
 
     async function cloudAction(type) {
@@ -394,34 +521,44 @@
         if(type === 'save') {
             const sheet = {}; document.querySelectorAll('.save').forEach(el => sheet[el.id] = el.value);
             const { error } = await _supabase.from('fichas').upsert({ username: user, password: pass, data: sheet, avatar: document.getElementById('main-avatar').src }, { onConflict: 'username' });
-            if(error) showNotify("Erro ao salvar.", "error"); else showNotify("Ficha salva!", "success");
+            if(error) showNotify("Erro ao salvar.", "error"); else showNotify("Ficha salva com sucesso!", "success");
         } else {
             const { data } = await _supabase.from('fichas').select('*').eq('username', user).single();
             if(data && data.password === pass) {
                 Object.keys(data.data).forEach(id => { const el = document.getElementById(id); if(el) el.value = data.data[id]; });
-                updateBagIcon(); // Atualiza ícone da mochila ao carregar
-                showNotify("Dados carregados!", "success");
+                if(data.avatar) { const img = document.getElementById('main-avatar'); img.src = data.avatar; img.style.display='block'; document.getElementById('placeholder').style.display='none'; }
+                updateCities(); 
+                document.getElementById('t-city').value = data.data['t-city'];
+                updateBagIcon(); 
+                for(let i=1; i<=6; i++) { 
+                    if(data.data[`p${i}-name`]) await selectPkmn(i, data.data[`p${i}-name`].toLowerCase().replace(/ /g, '-'), data.data);
+                    document.getElementById(`p${i}-shiny-btn`).classList.toggle('active', data.data[`p${i}-is-shiny`] === 'true');
+                    updateGimmickIcon(i); calcStats(i);
+                }
+                showNotify(`Dados carregados!`, "success");
             } else showNotify("Acesso negado.", "error");
         }
     }
 
     document.getElementById('file-input').onchange = (e) => {
+        if(!e.target.files.length) return;
         const reader = new FileReader();
         reader.onload = (event) => {
             const img = document.getElementById('image-to-crop'); img.src = event.target.result;
             document.getElementById('crop-modal').style.display = 'flex';
             if(cropper) cropper.destroy();
-            cropper = new Cropper(img, { aspectRatio: 1 });
+            cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 0.8, cropBoxMovable: false, cropBoxResizable: false });
         };
         reader.readAsDataURL(e.target.files[0]);
     };
 
     function finishCrop() {
-        const canvas = cropper.getCroppedCanvas();
-        document.getElementById('main-avatar').src = canvas.toDataURL();
-        document.getElementById('main-avatar').style.display = 'block';
+        const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
+        const img = document.getElementById('main-avatar');
+        img.src = canvas.toDataURL(); img.style.display = 'block';
         document.getElementById('placeholder').style.display = 'none';
         document.getElementById('crop-modal').style.display = 'none';
+        showNotify("Avatar atualizado!", "success");
     }
 
     init();
