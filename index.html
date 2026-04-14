@@ -19,9 +19,23 @@
             --text-dim: #94a3b8;
             --shiny: #ffce4b;
             --money: #fbbf24;
+            --male: #60a5fa;
+            --female: #f472b6;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* CURSOR PERSONALIZADO */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: url('https://cur.cursors-4u.net/games/gam-13/gam1282.cur'), auto !important;
+        }
+        
+        button, a, input, select, textarea, .avatar-box, .shiny-toggle, .gender-btn {
+            cursor: url('https://cur.cursors-4u.net/games/gam-13/gam1281.cur'), pointer !important;
+        }
+
         body { background: radial-gradient(circle at top right, #111827, #05080f); color: var(--text); padding: 15px; min-height: 100vh; overflow-x: hidden; }
         .container { max-width: 1100px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
 
@@ -75,7 +89,7 @@
         .avatar-box { 
             width: 140px; height: 140px; border-radius: 50%; 
             background: #000; border: 3px solid var(--border); 
-            cursor: pointer; overflow: hidden; display: flex; 
+            overflow: hidden; display: flex; 
             align-items: center; justify-content: center; position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: 0.3s;
         }
@@ -90,36 +104,42 @@
         input, select, textarea { background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 12px; font-size: 0.85rem; width: 100%; transition: 0.3s; }
         input:focus { border-color: var(--secondary); outline: none; background: rgba(0,0,0,0.4); }
 
-        /* MOCHILA DESIGN DINÂMICO */
         .bag-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
         .bag-sprite { 
-            width: 50px; 
-            height: 45px; 
+            width: 50px; height: 45px; 
             background-image: url('https://i.ibb.co/SwH03wrc/Pt-bag.png');
-            background-repeat: no-repeat;
-            background-size: 100px 45px; 
-            image-rendering: pixelated;
-            transition: background-position 0.2s steps(1);
+            background-repeat: no-repeat; background-size: 100px 45px; 
+            image-rendering: pixelated; transition: background-position 0.2s steps(1);
         }
         .bag-male { background-position: 0px 0px; }
         .bag-female { background-position: -50px 0px; }
 
-        /* CAIXA DE DINHEIRO */
         .money-card { 
             background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0,0,0,0.3));
             border: 1px solid rgba(251, 191, 36, 0.3);
             border-radius: 16px; padding: 12px 18px; display: flex; align-items: center; gap: 15px;
             width: fit-content; min-width: 200px; margin-top: 15px;
         }
-        .money-symbol { 
-            font-family: 'Unbounded'; font-size: 1.5rem; color: var(--money); 
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-        }
+        .money-symbol { font-family: 'Unbounded'; font-size: 1.5rem; color: var(--money); text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
         .money-input-wrapper { flex: 1; }
-        .money-input-wrapper input { 
-            background: transparent; border: none; padding: 0; font-size: 1.2rem; 
-            font-weight: 800; color: var(--money); width: 100%; 
-        }
+        .money-input-wrapper input { background: transparent; border: none; padding: 0; font-size: 1.2rem; font-weight: 800; color: var(--money); width: 100%; }
+
+        /* POKEMON CARD STYLES */
+        .team-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .pkmn-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 22px; padding: 15px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+        .pkmn-header { display: flex; gap: 12px; align-items: center; }
+        .sprite-frame { width: 85px; height: 85px; background: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); image-rendering: pixelated; position: absolute; top: 0; left: 0; }
+        
+        .gimmick-badge { position: absolute; bottom: 5px; right: 5px; width: 28px; height: 28px; background-size: contain; background-repeat: no-repeat; background-position: center; pointer-events: none; z-index: 10; filter: drop-shadow(0 0 2px black); }
+        .shiny-toggle { position: absolute; top: 5px; left: 5px; z-index: 15; font-size: 1.2rem; filter: grayscale(1); transition: 0.3s; }
+        .shiny-toggle.active { filter: grayscale(0) drop-shadow(0 0 5px var(--shiny)); }
+
+        .gender-selector { display: flex; gap: 5px; margin-top: 5px; }
+        .gender-btn { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 5px; font-size: 0.9rem; color: var(--text-dim); transition: 0.3s; }
+        .gender-btn.active.male { background: var(--male); color: white; border-color: #93c5fd; }
+        .gender-btn.active.female { background: var(--female); color: white; border-color: #f9a8d4; }
+        .gender-btn.disabled { opacity: 0.1; pointer-events: none; }
 
         .stats-container { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
         .stat-row { display: grid; grid-template-columns: 80px 1fr 1fr 1fr; gap: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; }
@@ -127,31 +147,25 @@
         .stat-val { font-weight: 700; color: var(--accent); text-align: center; }
         .points-badge { background: var(--secondary); padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; margin-bottom: 10px; display: inline-block; }
 
-        .team-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .pkmn-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 22px; padding: 15px; display: flex; flex-direction: column; gap: 10px; position: relative; }
-        .pkmn-header { display: flex; gap: 12px; align-items: center; }
-        
-        .sprite-frame { width: 85px; height: 85px; background: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); position: relative; overflow: hidden; }
-        .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); image-rendering: pixelated; position: absolute; top: 0; left: 0; }
-        
-        .gimmick-badge { position: absolute; bottom: 5px; right: 5px; width: 28px; height: 28px; background-size: contain; background-repeat: no-repeat; background-position: center; pointer-events: none; z-index: 10; filter: drop-shadow(0 0 2px black); }
-        .shiny-toggle { position: absolute; top: 5px; left: 5px; cursor: pointer; z-index: 15; font-size: 1.2rem; filter: grayscale(1); transition: 0.3s; }
-        .shiny-toggle.active { filter: grayscale(0) drop-shadow(0 0 5px var(--shiny)); }
-
         .search-area { position: relative; flex: 1; }
         .results-box { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border-radius: 10px; z-index: 100; max-height: 150px; overflow-y: auto; display: none; border: 1px solid var(--secondary); }
-        .results-box div { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.85rem; display: flex; align-items: center; gap: 10px; }
+        .results-box div { padding: 10px; border-bottom: 1px solid var(--border); font-size: 0.85rem; display: flex; align-items: center; gap: 10px; }
         .results-box div:hover { background: rgba(255,255,255,0.1); }
         .results-box img { width: 24px; height: 24px; object-fit: contain; }
 
-        .btn { padding: 10px 15px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+        .btn { padding: 10px 15px; border-radius: 10px; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.7rem; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
         .btn-green { background: var(--accent); color: #05080f; }
         .btn-blue { background: var(--secondary); color: white; }
-        .btn-convert { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; width: 100%; margin-top: 10px; padding: 15px; font-size: 0.9rem; }
+        
+        .actions-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .btn-convert { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; width: 100%; padding: 15px; font-size: 0.9rem; }
+        .btn-pkmn-ficha { background: var(--secondary); color: white; margin-top: 10px; font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.2); }
+        
+        .result-box { display: none; margin-top: 15px; background: #000; color: var(--accent); padding: 15px; border-radius: 12px; border: 1px dashed var(--accent); font-family: monospace; white-space: pre-wrap; font-size: 0.8rem; overflow-x: auto; position: relative; }
+        .btn-copy-float { background: #334155; color: white; width: 100%; padding: 12px; font-size: 0.8rem; margin-top: 10px; border-radius: 10px; border: none; display: none; cursor: pointer; }
 
         #crop-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .crop-wrap { width: 90vw; height: 90vw; max-width: 400px; max-height: 400px; background: #111; border-radius: 10px; overflow: hidden; }
-        .cropper-view-box, .cropper-face { border-radius: 50%; }
 
         @media (min-width: 768px) {
             .trainer-header { flex-direction: row; align-items: center; }
@@ -159,8 +173,6 @@
             .team-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (min-width: 1024px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
-
-        #convert-result { display: none; margin-top: 15px; background: #000; color: var(--accent); padding: 15px; border-radius: 12px; border: 1px dashed var(--accent); font-family: monospace; white-space: pre-wrap; font-size: 0.8rem; overflow-x: auto; }
     </style>
 </head>
 <body>
@@ -205,7 +217,7 @@
                 <div class="input-group full-width"><label>Nome</label><input type="text" id="t-name" class="save"></div>
                 <div class="input-group"><label>Sexo</label><select id="t-sex" class="save" onchange="updateBagIcon()"><option value="">-</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option><option value="Outro">Outro</option></select></div>
                 <div class="input-group"><label>Idade</label><input type="number" id="t-age" class="save" min="10"></div>
-                <div class="input-group"><label>Altura</label><input type="text" id="t-height" class="save" placeholder="Ex: 1.75m"></div>
+                <div class="input-group"><label>Altura</label><input type="text" id="t-height" class="save" placeholder="Ex: 1.75"></div>
                 <div class="input-group"><label>Classe</label><select id="t-class" class="save"><option value="Treinador">Treinador</option><option value="Coordenador">Coordenador</option><option value="Criador">Criador</option><option value="Pesquisador">Pesquisador</option><option value="Ranger">Ranger</option><option value="Rocket">Equipe Rocket</option></select></div>
                 <div class="input-group"><label>Região</label><select id="t-region" class="save" onchange="updateCities()"></select></div>
                 <div class="input-group"><label>Cidade</label><select id="t-city" class="save"></select></div>
@@ -219,8 +231,7 @@
                 <div id="bag-icon-display" class="bag-sprite bag-male"></div>
                 <label>Mochila</label>
             </div>
-            <textarea id="t-bag" class="save" rows="4" placeholder="Ex: 5x Pokébolas, 2x Poções..."></textarea>
-            
+            <textarea id="t-bag" class="save" rows="4" placeholder="Ex: 1 Pokeball, 1 Poção"></textarea>
             <div class="money-card">
                 <div class="money-symbol">₽</div>
                 <div class="money-input-wrapper">
@@ -230,13 +241,20 @@
             </div>
         </div>
         
-        <button class="btn btn-convert" onclick="convertSheet()">✨ GERAR FICHA EM TEXTO</button>
-        <div id="convert-result"></div>
+        <div class="actions-group">
+            <button class="btn btn-convert" onclick="convertSheet()">✨ GERAR FICHA EM TEXTO</button>
+            <div id="convert-result-trainer" class="result-box"></div>
+            <button id="copy-btn-trainer" class="btn-copy-float" onclick="copyToClipboard('convert-result-trainer')">📋 COPIAR PARA O CLIPBOARD</button>
+        </div>
     </div>
 
     <div id="tab-pokemon" class="tab-content">
         <div class="section-tag"><h2>Gestão de Equipe</h2><div class="line"></div></div>
         <div id="team" class="team-grid"></div>
+        <div class="actions-group">
+            <div id="convert-result-pokemon" class="result-box"></div>
+            <button id="copy-btn-pokemon" class="btn-copy-float" onclick="copyToClipboard('convert-result-pokemon')">📋 COPIAR FICHA DO POKÉMON</button>
+        </div>
     </div>
 </div>
 
@@ -323,8 +341,17 @@
         icon.classList.remove('bag-male', 'bag-female');
         if (sex === "Masculino") icon.classList.add('bag-male');
         else if (sex === "Feminino") icon.classList.add('bag-female');
-        else if (sex === "Outro") icon.classList.add(Math.random() > 0.5 ? 'bag-male' : 'bag-female');
         else icon.classList.add('bag-male');
+    }
+
+    // Função corrigida para descer até o final máximo
+    function fastScroll() {
+        setTimeout(() => {
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 50); 
     }
 
     async function init() {
@@ -350,9 +377,18 @@
             <div class="pkmn-card">
                 <span id="p${i}-shiny-btn" class="shiny-toggle" onclick="toggleShiny(${i})">✨</span>
                 <input type="hidden" id="p${i}-is-shiny" value="false" class="save">
+                <input type="hidden" id="p${i}-gender" value="Indefinido" class="save">
                 <div class="pkmn-header">
                     <div class="sprite-frame"><img id="img-${i}" class="pkmn-img" style="display:none"><div id="gim-badge-${i}" class="gimmick-badge"></div></div>
-                    <div class="search-area"><label>Pokémon #${i}</label><input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie..."><div id="drop-${i}" class="results-box"></div></div>
+                    <div class="search-area">
+                        <label>Pokémon #${i}</label>
+                        <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie...">
+                        <div id="drop-${i}" class="results-box"></div>
+                        <div class="gender-selector">
+                            <button id="p${i}-btn-m" class="gender-btn male" onclick="setGender(${i}, 'Macho')">♂</button>
+                            <button id="p${i}-btn-f" class="gender-btn female" onclick="setGender(${i}, 'Fêmea')">♀</button>
+                        </div>
+                    </div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
                     <div class="input-group"><label>Apelido</label><input type="text" id="p${i}-nick" class="save" placeholder="Apelido..."></div>
@@ -360,11 +396,16 @@
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
                     <div class="search-area"><label>Item</label><input type="text" id="p${i}-item" class="save" oninput="doItemSearch(${i})" placeholder="Item..."><div id="drop-item-${i}" class="results-box"></div></div>
-                    <div class="input-group"><label>Gimmick</label><select id="p${i}-gim" class="save" onchange="updateGimmickIcon(${i})"><option value="">Nenhuma</option><option value="Mega">Mega</option><option value="Z-Move">Z-Move</option><option value="Dynamax">Dynamax</option><option value="Tera">Tera</option></select></div>
+                    <div class="input-group"><label>Pokébola</label><input type="text" id="p${i}-ball" class="save" value="Padrão"></div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 60px; gap:8px">
-                    <select id="p${i}-nature" class="save" onchange="calcStats(${i})"><option value="">Nature</option>${Object.keys(natures).map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
-                    <input type="number" id="p${i}-lvl" class="save" value="1" min="1" max="100" onchange="calcStats(${i}); updateMoves(${i});">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px">
+                    <div class="input-group"><label>Amizade</label><input type="number" id="p${i}-friend" class="save" value="0" min="0" max="255"></div>
+                    <div class="input-group"><label>Level</label><input type="number" id="p${i}-lvl" class="save" value="1" min="1" max="100" onchange="calcStats(${i}); updateMoves(${i});"></div>
+                    <div class="input-group"><label>XP Atual</label><input type="text" id="p${i}-xp" class="save" placeholder=""></div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
+                    <div class="input-group"><label>Nature</label><select id="p${i}-nature" class="save" onchange="calcStats(${i})"><option value="">Nature</option>${Object.keys(natures).map(n=>`<option value="${n}">${n}</option>`).join('')}</select></div>
+                    <div class="input-group"><label>Gimmick</label><select id="p${i}-gim" class="save" onchange="updateGimmickIcon(${i})"><option value="">Nenhuma</option><option value="Mega">Mega</option><option value="Z-Move">Z-Move</option><option value="Dynamax">Dynamax</option><option value="Tera">Tera</option></select></div>
                 </div>
                 <div class="stats-container">
                     <div class="points-badge">Pontos Disponíveis: <span id="p${i}-pts">0</span></div>
@@ -374,8 +415,15 @@
                     <select id="p${i}-m1" class="save"></select><select id="p${i}-m2" class="save"></select>
                     <select id="p${i}-m3" class="save"></select><select id="p${i}-m4" class="save"></select>
                 </div>
+                <button class="btn btn-pkmn-ficha" onclick="convertPkmnFicha(${i})">GERAR FICHA DE POKÉMON</button>
             </div>`;
         }
+    }
+
+    function setGender(slot, gender) {
+        document.getElementById(`p${slot}-gender`).value = gender;
+        document.getElementById(`p${slot}-btn-m`).classList.toggle('active', gender === 'Macho');
+        document.getElementById(`p${slot}-btn-f`).classList.toggle('active', gender === 'Fêmea');
     }
 
     function toggleShiny(slot) {
@@ -445,6 +493,33 @@
         }
     }
 
+    async function selectPkmn(slot, name, restoreData = null) {
+        document.getElementById(`p${slot}-name`).value = format(name);
+        document.getElementById(`drop-${slot}`).style.display = "none";
+        try {
+            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+            const d = await r.json();
+            pkmnFullData[slot] = d;
+            const specRes = await fetch(d.species.url);
+            const specData = await specRes.json();
+            const gRate = specData.gender_rate;
+            const btnM = document.getElementById(`p${slot}-btn-m`);
+            const btnF = document.getElementById(`p${slot}-btn-f`);
+            btnM.classList.remove('disabled'); btnF.classList.remove('disabled');
+            if(gRate === -1) { btnM.classList.add('disabled'); btnF.classList.add('disabled'); setGender(slot, 'Indefinido'); }
+            else if(gRate === 8) { btnM.classList.add('disabled'); setGender(slot, 'Fêmea'); }
+            else if(gRate === 0) { btnF.classList.add('disabled'); setGender(slot, 'Macho'); }
+            else { if(!restoreData) setGender(slot, 'Macho'); }
+            updatePkmnImage(slot, d, document.getElementById(`p${slot}-is-shiny`).value === 'true');
+            const ab = document.getElementById(`p${slot}-ability`);
+            ab.innerHTML = '<option value="">Habilidade</option>';
+            d.abilities.forEach(a => ab.innerHTML += `<option value="${format(a.ability.name)}">${format(a.ability.name)}</option>`);
+            if (restoreData) { ab.value = restoreData[`p${slot}-ability`]; setGender(slot, restoreData[`p${slot}-gender`]); }
+            if(!restoreData) { d.stats.forEach((s, idx) => { const map = ['hp', 'atk', 'def', 'spa', 'spd', 'spe']; document.getElementById(`p${slot}-base-${map[idx]}`).value = s.base_stat; }); calcStats(slot); }
+            moveCache[slot] = d.moves; updateMoves(slot, restoreData);
+        } catch(e) {}
+    }
+
     function doItemSearch(slot) {
         const q = document.getElementById(`p${slot}-item`).value.toLowerCase().replace(/ /g, '-');
         const drop = document.getElementById(`drop-item-${slot}`); drop.innerHTML = "";
@@ -461,23 +536,6 @@
         }
     }
 
-    async function selectPkmn(slot, name, restoreData = null) {
-        document.getElementById(`p${slot}-name`).value = format(name);
-        document.getElementById(`drop-${slot}`).style.display = "none";
-        try {
-            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-            const d = await r.json();
-            pkmnFullData[slot] = d;
-            updatePkmnImage(slot, d, document.getElementById(`p${slot}-is-shiny`).value === 'true');
-            const ab = document.getElementById(`p${slot}-ability`);
-            ab.innerHTML = '<option value="">Habilidade</option>';
-            d.abilities.forEach(a => ab.innerHTML += `<option value="${format(a.ability.name)}">${format(a.ability.name)}</option>`);
-            if (restoreData) ab.value = restoreData[`p${slot}-ability`];
-            if(!restoreData) { d.stats.forEach((s, idx) => { const map = ['hp', 'atk', 'def', 'spa', 'spd', 'spe']; document.getElementById(`p${slot}-base-${map[idx]}`).value = s.base_stat; }); calcStats(slot); }
-            moveCache[slot] = d.moves; updateMoves(slot, restoreData);
-        } catch(e) {}
-    }
-
     function updateMoves(slot, restoreData = null) {
         const moves = moveCache[slot]; if(!moves) return;
         const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 1;
@@ -491,11 +549,11 @@
         }
     }
 
-    /* CONVERSOR ATUALIZADO CONFORME EXEMPLO */
     function convertSheet() {
         const d = (id) => document.getElementById(id).value || "---";
-        const bagLines = document.getElementById('t-bag').value.split('\n').filter(l => l.trim() !== "");
-        let bagText = ""; bagLines.forEach(l => bagText += `╰┈➤ ${l}\n`);
+        const rawBag = document.getElementById('t-bag').value;
+        const bagItems = rawBag.split(/[\n,]+/).map(item => item.trim()).filter(item => item !== "");
+        let bagText = ""; bagItems.forEach(item => { bagText += `╰┈➤ - ${item}\n`; });
         let pkmnText = "";
         for(let i=1; i<=6; i++) {
             const pName = document.getElementById(`p${i}-name`).value;
@@ -504,7 +562,6 @@
             if(pName) pkmnText += `╰┈➤ ${pNick || pName} (Lv. ${pLvl})${document.getElementById(`p${i}-is-shiny`).value === 'true' ? ' ✨' : ''}\n`;
             else pkmnText += `╰┈➤ Vazio\n`;
         }
-        
         const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎\n` +
             `- Nome: ${d('t-name')}\n` +
             `- Sexo: ${d('t-sex')}\n` +
@@ -512,12 +569,65 @@
             `- Altura: ${d('t-height')}\n` +
             `- Dinheiro: ₽ ${d('t-money')}\n\n` +
             `━━━━❰BOLSA❱━━━━\n` +
-            `${bagText}\n` +
+            `${bagText}` +
             `━━━━▣━━◤POKÉMONS◢━━▣━━━━━\n` +
             `${pkmnText}`;
-            
-        const res = document.getElementById('convert-result');
+        const res = document.getElementById('convert-result-trainer');
         res.innerText = template; res.style.display = 'block';
+        document.getElementById('copy-btn-trainer').style.display = 'block';
+        fastScroll();
+    }
+
+    function convertPkmnFicha(slot) {
+        const d = (id) => document.getElementById(id).value || "---";
+        const pkmnName = d(`p${slot}-name`);
+        const pNick = d(`p${slot}-nick`);
+        if(pkmnName === "---") return showNotify("Escolha um Pokémon primeiro!", "error");
+        const displayID = (pNick !== "---" && pNick !== "") ? `${pNick} (${pkmnName})` : pkmnName;
+        const isShiny = document.getElementById(`p${slot}-is-shiny`).value === 'true' ? ' ✨' : '';
+        const moves = [d(`p${slot}-m1`), d(`p${slot}-m2`), d(`p${slot}-m3`), d(`p${slot}-m4`)].filter(m => m !== "Golpe");
+        const statLabelMap = {hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'Sp.Ataque', spd: 'Sp.Defesa', spe: 'Velocidade'};
+        const nature = natures[d(`p${slot}-nature`)] || {plus: null, minus: null};
+        let statsText = "";
+        ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].forEach(s => {
+            const base = parseInt(d(`p${slot}-base-${s}`)) || 0;
+            const add = parseInt(d(`p${slot}-up-${s}`)) || 0;
+            const total = document.getElementById(`p${slot}-total-${s}`).innerText;
+            let percTotal = 0;
+            if(nature.plus === s) percTotal += 10;
+            if(nature.minus === s) percTotal -= 10;
+            percTotal += Math.floor(add / 10);
+            const percSign = percTotal >= 0 ? "+" : "";
+            statsText += `→ ${statLabelMap[s]}: ${base} (${percSign}${percTotal}%) = ${total}\n`;
+        });
+        const template = `°Ficha do Pokémon°\n\n` +
+            `- Nome: ${displayID}${isShiny}\n` +
+            `- Sexo: ${d(`p${slot}-gender`)}\n` +
+            `- Natureza: ${d(`p${slot}-nature`)}\n` +
+            `- Amizade: ${d(`p${slot}-friend`)}\n` +
+            `- Level: ${d(`p${slot}-lvl`)}\n` +
+            `- XP: ${d(`p${slot}-xp`)}\n\n` +
+            `------Status Puro------\n` +
+            `${statsText}\n` +
+            `------Habilidade------\n` +
+            `→ ${d(`p${slot}-ability`)}\n\n` +
+            `------Item equipado------\n` +
+            `→ ${d(`p${slot}-item`)}\n\n` +
+            `------Pokeball Usada------\n` +
+            `→ ${d(`p${slot}-ball`)}\n\n` +
+            `------Lista de Movimentos------\n` +
+            `${moves.map(m => `→ ${m}`).join('\n')}`;
+        const res = document.getElementById('convert-result-pokemon');
+        res.innerText = template; res.style.display = 'block';
+        document.getElementById('copy-btn-pokemon').style.display = 'block';
+        fastScroll();
+    }
+
+    function copyToClipboard(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            showNotify("Copiado com sucesso!", "success");
+        }).catch(() => showNotify("Erro ao copiar.", "error"));
     }
 
     async function cloudAction(type) {
