@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -377,4 +376,22 @@
         const bagLines = document.getElementById('t-bag').value.split('\n').filter(l => l.trim() !== "");
         let bagText = "";
         const linesToRender = Math.max(3, bagLines.length);
-        for(let i=0; i < linesToRender; i++) { bagText +
+        for(let i=0; i < linesToRender; i++) { bagText += `╰┈➤ ${bagLines[i] || ""}\n`; }
+        let pkmnText = "";
+        for(let i=1; i<=6; i++) {
+            const pName = document.getElementById(`p${i}-name`).value;
+            const pLvl = document.getElementById(`p${i}-lvl`).value;
+            pkmnText += `╰┈➤ ${pName ? `${pName} (Lv. ${pLvl})` : "Vazio"}\n`;
+        }
+        const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎\n- Nome: ${d('t-name')}\n- Sexo: ${d('t-sex')}\n- Idade: ${d('t-age')}\n- Dinheiro: ₽ ${d('t-money')}\n\n━━━━❰BOLSA❱━━━━\n${bagText}\n━━━━▣━━◤POKÉMONS◢━━▣━━━━━\n${pkmnText}`;
+        const res = document.getElementById('convert-result');
+        res.innerText = template; res.style.display = 'block';
+        alert("Convertido!");
+    }
+
+    async function cloudAction(type) {
+        const user = document.getElementById('user-id').value;
+        const pass = document.getElementById('user-pass').value;
+        if(!user || !pass) return alert("Preencha o acesso.");
+        if(type === 'save') {
+            const sheet = {}; document.querySelectorAll('.save').forEach(el 
