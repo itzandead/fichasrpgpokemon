@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokéSheet Cloud Ultra - Gimmick Fixed</title>
+    <title>PokéSheet Cloud - Official Gimmicks</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
         :root {
             --bg: #05080f;
@@ -19,248 +18,83 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: radial-gradient(circle at top right, #111827, #05080f); color: var(--text); padding: 15px; min-height: 100vh; }
+        .container { max-width: 1100px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
 
-        body {
-            background: radial-gradient(circle at top right, #111827, #05080f);
-            color: var(--text);
-            padding: 15px;
-            min-height: 100vh;
-        }
+        /* Estilo dos Cards */
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .pkmn-card { background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 22px; padding: 15px; }
 
-        .container { max-width: 1100px; margin: auto; display: flex; flex-direction: column; gap: 25px; }
-
-        .auth-bar {
-            background: var(--surface);
-            backdrop-filter: blur(15px);
-            padding: 18px 25px;
-            border-radius: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo { font-weight: 800; font-size: 1.3rem; letter-spacing: -1px; background: linear-gradient(to right, #ff3e3e, #f87171); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .auth-inputs { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; justify-content: flex-end; }
-        .auth-inputs input { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 12px; flex: 1; min-width: 120px; }
-
-        .section-tag { display: flex; align-items: center; gap: 10px; margin-bottom: -10px; }
-        .section-tag h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
-        .line { height: 1px; flex: 1; background: var(--border); }
-
-        .panel {
-            background: var(--surface);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 20px;
-        }
-
-        .trainer-header { display: flex; gap: 20px; flex-direction: column; align-items: center; }
+        .pkmn-header { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
         
-        .avatar-box {
-            width: 140px; height: 140px; border-radius: 30px;
-            background: #000; border: 2px dashed var(--border);
-            cursor: pointer; overflow: hidden; display: flex;
-            align-items: center; justify-content: center;
-        }
-        .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        .form-grid { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        .full-width { grid-column: span 2; }
-        
-        label { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
-
-        input, select, textarea {
-            background: rgba(0,0,0,0.2); border: 1px solid var(--border);
-            color: white; padding: 10px; border-radius: 12px; font-size: 0.85rem; width: 100%;
-        }
-
-        .team-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .pkmn-card {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-            border-radius: 22px; padding: 15px; display: flex; flex-direction: column; gap: 10px;
-        }
-
-        .pkmn-header { display: flex; gap: 12px; align-items: center; }
-        
+        /* Frame do Pokemon Ampliado */
         .sprite-frame { 
-            width: 85px; height: 85px; background: #000; border-radius: 18px; 
+            width: 90px; height: 90px; background: #000; border-radius: 18px; 
             display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);
-            position: relative; overflow: hidden;
+            position: relative; overflow: visible; /* Permitir que o ícone da gimmick possa sobressair levemente se necessário */
         }
-        .sprite-frame img.pkmn-img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; transform: scale(1.4); }
         
+        .pkmn-img { 
+            width: 100%; height: 100%; object-fit: contain; 
+            image-rendering: pixelated; 
+            transform: scale(1.5); /* Pokémon bem maior */
+        }
+
+        /* Ícone da Gimmick Oficial */
         .gimmick-badge {
-            position: absolute; bottom: 5px; right: 5px; width: 24px; height: 24px;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            pointer-events: none; z-index: 5; filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+            position: absolute; 
+            bottom: -5px; 
+            right: -5px; 
+            width: 32px; 
+            height: 32px;
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+            display: none;
         }
 
-        .search-area { position: relative; flex: 1; }
+        .search-area { flex: 1; }
+        input, select, textarea {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            color: white; padding: 8px; border-radius: 10px; font-size: 0.85rem; width: 100%;
+        }
+
+        label { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; display: block; }
+
         .results-box {
-            position: absolute; top: 100%; left: 0; right: 0; background: #1e293b;
-            border-radius: 10px; z-index: 100; max-height: 150px; overflow-y: auto; display: none;
+            position: absolute; background: #1e293b; border-radius: 8px; 
+            z-index: 100; max-height: 150px; overflow-y: auto; display: none; width: 200px;
         }
-        .results-box div { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
-
-        .btn {
-            padding: 10px 15px; border-radius: 10px; border: none; 
-            font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.7rem;
-            transition: 0.3s;
-        }
-        .btn-green { background: var(--accent); color: #05080f; }
-        .btn-blue { background: var(--secondary); color: white; }
-        .btn-convert { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; width: 100%; margin-top: 10px; padding: 15px; font-size: 0.9rem; }
-
-        .inv-layout { display: flex; flex-direction: column; gap: 15px; }
-        .money-box {
-            background: linear-gradient(135deg, #064e3b, #022c22);
-            border-radius: 18px; padding: 15px; text-align: center; border: 1px solid var(--accent);
-        }
-        .money-box input { background: transparent; border: none; font-size: 1.5rem; text-align: center; font-weight: 800; color: var(--accent); }
-
-        #crop-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .crop-wrap { width: 85vw; height: 85vw; max-width: 350px; max-height: 350px; background: #000; overflow: hidden; }
-
-        @media (min-width: 768px) {
-            .auth-inputs { width: auto; }
-            .auth-inputs input { width: 150px; }
-            .trainer-header { flex-direction: row; align-items: flex-start; }
-            .form-grid { grid-template-columns: repeat(4, 1fr); }
-            .team-grid { grid-template-columns: 1fr 1fr; }
-            .inv-layout { display: grid; grid-template-columns: 1fr 200px; }
-        }
-
-        @media (min-width: 1024px) {
-            .team-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        #convert-result {
-            display: none; margin-top: 15px; background: #000; color: var(--accent);
-            padding: 15px; border-radius: 12px; border: 1px dashed var(--accent);
-            font-family: monospace; white-space: pre-wrap; font-size: 0.8rem; overflow-x: auto;
-        }
+        .results-box div { padding: 8px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="auth-bar">
-        <div class="logo">POKÉSHEET CLOUD</div>
-        <div class="auth-inputs">
-            <input type="text" id="user-id" placeholder="ID">
-            <input type="password" id="user-pass" placeholder="Senha">
-            <button class="btn btn-green" onclick="cloudAction('save')">Salvar</button>
-            <button class="btn btn-blue" onclick="cloudAction('load')">Entrar</button>
-        </div>
-    </div>
-
-    <div class="section-tag"><h2>Identificação</h2><div class="line"></div></div>
-
-    <div class="panel trainer-header">
-        <div class="avatar-wrapper">
-            <div onclick="document.getElementById('file-input').click()" class="avatar-box">
-                <img id="main-avatar" style="display:none">
-                <span id="placeholder" style="font-size:0.6rem; color:var(--text-dim)">FOTO / AVATAR</span>
-            </div>
-            <input type="file" id="file-input" hidden accept="image/*">
-        </div>
-
-        <div class="form-grid">
-            <div class="input-group full-width"><label>Nome Completo</label><input type="text" id="t-name" class="save"></div>
-            <div class="input-group"><label>Sexo</label><select id="t-sex" class="save"><option value="">-</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option><option value="Outro">Outro</option></select></div>
-            <div class="input-group"><label>Idade</label><input type="number" id="t-age" class="save" min="10"></div>
-            <div class="input-group"><label>Classe</label><select id="t-class" class="save"><option value="Treinador">Treinador</option><option value="Coordenador">Coordenador</option><option value="Criador">Criador</option><option value="Pesquisador">Pesquisador</option><option value="Ranger">Ranger</option><option value="Rocket">Equipe Rocket</option></select></div>
-            <div class="input-group"><label>Região</label><select id="t-region" class="save" onchange="updateCities()"></select></div>
-            <div class="input-group full-width"><label>Cidade</label><select id="t-city" class="save"></select></div>
-            <div class="input-group full-width"><label>Descrição Física / Créditos</label><input type="text" id="t-appearance" class="save"></div>
-        </div>
-    </div>
-
-    <div class="section-tag"><h2>Equipe Pokémon</h2><div class="line"></div></div>
     <div id="team" class="team-grid"></div>
-
-    <div class="section-tag"><h2>Bolsa & Notas</h2><div class="line"></div></div>
-    <div class="panel inv-layout">
-        <div class="input-group"><label>Itens no Inventário</label><textarea id="t-bag" class="save" rows="4" placeholder="Itens..."></textarea></div>
-        <div class="money-box"><label style="color:var(--accent)"> ₽ DINHEIRO</label><br><input type="text" id="t-money" class="save" value="0"></div>
-    </div>
-
-    <div class="panel">
-        <label>Anotações Adicionais</label>
-        <textarea id="notes" class="save" rows="2"></textarea>
-        <button class="btn btn-convert" onclick="convertSheet()">✨ GERAR FICHA EM TEXTO</button>
-        <div id="convert-result"></div>
-    </div>
 </div>
-
-<div id="crop-modal">
-    <div class="crop-wrap"><img id="image-to-crop"></div>
-    <div style="margin-top:20px; display:flex; gap:10px;">
-        <button class="btn" style="background:#444" onclick="document.getElementById('crop-modal').style.display='none'">CANCELAR</button>
-        <button class="btn btn-green" onclick="finishCrop()">SALVAR</button>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <script>
-    const SUPABASE_URL = 'https://pjggfdjixenopkiiugmj.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZ2dmZGppeGVub3BraWl1Z21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMjIwMDcsImV4cCI6MjA5MTY5ODAwN30.QWr9d3qT2216to7VOEmc_hzu-g789FTLdYdDUtUosk0';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let allPkmn = [];
-    let moveCache = {};
-    let cropper;
-
-    const natures = ['Adamant', 'Bashful', 'Bold', 'Brave', 'Calm', 'Careful', 'Docile', 'Gentle', 'Hardy', 'Hasty', 'Impish', 'Jolly', 'Lonely', 'Mild', 'Modest', 'Naive', 'Naughty', 'Quiet', 'Quirky', 'Rash', 'Relaxed', 'Sassy', 'Serious', 'Timid'];
-    
-    // Ícones Oficiais das Mecânicas (Símbolos)
-    const gimmicks = {
+    // URLs estáveis para os símbolos oficiais (Sprites da PokeSprite/Msikma)
+    const gimmickIcons = {
         "Mega": "https://raw.githubusercontent.com/msikma/pokesprite/master/misc/battle-icon/mega.png",
         "Z-Move": "https://raw.githubusercontent.com/msikma/pokesprite/master/misc/battle-icon/z-move.png",
         "G-Max": "https://raw.githubusercontent.com/msikma/pokesprite/master/misc/battle-icon/gigantamax.png",
         "Tera": "https://raw.githubusercontent.com/msikma/pokesprite/master/misc/battle-icon/terastal.png"
     };
 
-    const worldData = {
-        "Kanto": ["Pallet Town", "Viridian City", "Pewter City", "Cerulean City", "Vermilion City", "Lavender Town", "Celadon City", "Fuchsia City", "Saffron City", "Cinnabar Island"],
-        "Johto": ["New Bark Town", "Cherrygrove City", "Violet City", "Azalea Town", "Goldenrod City", "Ecruteak City", "Olivine City", "Cianwood City", "Mahogany Town", "Blackthorn City"],
-        "Hoenn": ["Littleroot Town", "Oldale Town", "Petalburg City", "Rustboro City", "Dewford Town", "Slateport City", "Mauville City", "Verdanturf Town", "Fallarbor Town", "Lavaridge Town", "Fortree City", "Lilycove City", "Mossdeep City", "Sootopolis City"],
-        "Sinnoh": ["Twinleaf Town", "Sandgem Town", "Jubilife City", "Oreburgh City", "Floaroma Town", "Eterna City", "Hearthome City", "Solaceon Town", "Veilstone City", "Pastoria City", "Celestic Town", "Canalave City", "Snowpoint City", "Sunyshore City"],
-        "Unova": ["Nuvema Town", "Accumula Town", "Striaton City", "Nacrene City", "Castelia City", "Nimbasa City", "Driftveil City", "Mistralton City", "Icirrus City", "Opelucid City", "Humilau City"],
-        "Kalos": ["Vaniville Town", "Santalune City", "Lumiose City", "Camphrier Town", "Cyllage City", "Ambrette Town", "Shalour City", "Coumarine City", "Laverre City", "Dendemille Town", "Anistar City", "Snowbelle City"],
-        "Alola": ["Hau'oli City", "Heahea City", "Konikoni City", "Malie City", "Tapu Village", "Seafolk Village"],
-        "Galar": ["Postwick", "Wedgehurst", "Motostoke", "Turffield", "Hulbury", "Hammerlocke", "Stow-on-Side", "Ballonlea", "Circhester", "Spikemuth", "Wyndon"],
-        "Paldea": ["Cabo Poco", "Mesagoza", "Cortondo", "Artazon", "Levincia", "Cascarrafa", "Porto Marinada", "Medali", "Montenevera", "Alfornada", "Glaseado"]
-    };
-
-    function format(str) { return str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+    let allPkmn = [];
 
     async function init() {
-        const regSelect = document.getElementById('t-region');
-        regSelect.innerHTML = '<option value="">Região...</option>';
-        Object.keys(worldData).forEach(r => regSelect.innerHTML += `<option value="${r}">${r}</option>`);
         renderSlots();
-        try {
-            const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-            const d = await r.json();
-            allPkmn = d.results;
-        } catch(e) {}
+        const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+        const d = await r.json();
+        allPkmn = d.results;
     }
 
     function renderSlots() {
-        const team = document.getElementById('team'); team.innerHTML = "";
+        const team = document.getElementById('team');
         for(let i=1; i<=6; i++) {
             team.innerHTML += `
             <div class="pkmn-card">
@@ -269,16 +103,15 @@
                         <img id="img-${i}" class="pkmn-img" style="display:none">
                         <div id="gim-badge-${i}" class="gimmick-badge"></div>
                     </div>
-                    <div class="search-area">
+                    <div class="search-area" style="position:relative">
                         <label>Pokémon #${i}</label>
-                        <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie...">
+                        <input type="text" id="p${i}-name" oninput="doSearch(${i})" placeholder="Nome do Pokémon...">
                         <div id="drop-${i}" class="results-box"></div>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 60px 85px; gap:8px">
-                    <select id="p${i}-nature" class="save"><option value="">Nature</option>${natures.map(n=>`<option value="${n}">${n}</option>`).join('')}</select>
-                    <input type="number" id="p${i}-lvl" class="save" value="1" min="1" max="100" onchange="updateMoves(${i})">
-                    <select id="p${i}-gim" class="save" onchange="updateGimmickIcon(${i})">
+                <div style="display:grid; grid-template-columns: 1fr 85px; gap:8px">
+                    <select id="p${i}-nature"><option value="">Nature</option></select>
+                    <select id="p${i}-gim" onchange="updateGimmick(${i})">
                         <option value="">Gimmick</option>
                         <option value="Mega">Mega</option>
                         <option value="Z-Move">Z-Move</option>
@@ -286,31 +119,19 @@
                         <option value="Tera">Tera</option>
                     </select>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
-                    <select id="p${i}-m1" class="save"></select><select id="p${i}-m2" class="save"></select>
-                    <select id="p${i}-m3" class="save"></select><select id="p${i}-m4" class="save"></select>
-                </div>
             </div>`;
         }
     }
 
-    function updateGimmickIcon(slot) {
+    function updateGimmick(slot) {
         const val = document.getElementById(`p${slot}-gim`).value;
         const badge = document.getElementById(`gim-badge-${slot}`);
-        if(val && gimmicks[val]) {
-            badge.style.backgroundImage = `url('${gimmicks[val]}')`;
+        if(val && gimmickIcons[val]) {
+            badge.style.backgroundImage = `url('${gimmickIcons[val]}')`;
+            badge.style.display = 'block';
         } else {
-            badge.style.backgroundImage = 'none';
+            badge.style.display = 'none';
         }
-    }
-
-    function updateCities() {
-        const r = document.getElementById('t-region').value;
-        const s = document.getElementById('t-city');
-        const cur = s.value;
-        s.innerHTML = '<option value="">Cidade...</option>';
-        if(worldData[r]) worldData[r].forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
-        if(cur) s.value = cur;
     }
 
     function doSearch(slot) {
@@ -321,101 +142,22 @@
         if(hits.length) {
             drop.style.display="block";
             hits.forEach(p => {
-                const d = document.createElement('div'); d.innerText = format(p.name);
+                const d = document.createElement('div');
+                d.innerText = p.name.charAt(0).toUpperCase() + p.name.slice(1);
                 d.onclick = () => selectPkmn(slot, p.name);
                 drop.appendChild(d);
             });
         }
     }
 
-    async function selectPkmn(slot, name, restoreData = null) {
-        document.getElementById(`p${slot}-name`).value = format(name);
+    async function selectPkmn(slot, name) {
+        document.getElementById(`p${slot}-name`).value = name.charAt(0).toUpperCase() + name.slice(1);
         document.getElementById(`drop-${slot}`).style.display = "none";
-        try {
-            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-            const d = await r.json();
-            const img = document.getElementById(`img-${slot}`);
-            // Uso do sprite frontal padrão para manter o aspecto pixelado proporcional ao tamanho ampliado
-            img.src = d.sprites.front_default; 
-            img.style.display = "block";
-            moveCache[slot] = d.moves;
-            updateMoves(slot, restoreData);
-        } catch(e) {}
-    }
-
-    function updateMoves(slot, restoreData = null) {
-        const moves = moveCache[slot]; if(!moves) return;
-        const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 1;
-        const avail = moves.filter(m => m.version_group_details.some(vd => vd.move_learn_method.name === 'level-up' && vd.level_learned_at <= lvl)).map(m => m.move.name);
-        const unique = [...new Set(avail)].map(format).sort();
-        for(let i=1; i<=4; i++) {
-            const s = document.getElementById(`p${slot}-m${i}`);
-            const cur = s.value; s.innerHTML = '<option value="">Golpe</option>';
-            unique.forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
-            if(restoreData) s.value = restoreData[`p${slot}-m${i}`]; else s.value = cur;
-        }
-    }
-
-    function convertSheet() {
-        const d = (id) => document.getElementById(id).value || "---";
-        const bagLines = document.getElementById('t-bag').value.split('\n').filter(l => l.trim() !== "");
-        let bagText = "";
-        const linesToRender = Math.max(3, bagLines.length);
-        for(let i=0; i < linesToRender; i++) { bagText += `╰┈➤ ${bagLines[i] || ""}\n`; }
-        let pkmnText = "";
-        for(let i=1; i<=6; i++) {
-            const pName = document.getElementById(`p${i}-name`).value;
-            const pLvl = document.getElementById(`p${i}-lvl`).value;
-            const pGim = document.getElementById(`p${i}-gim`).value;
-            pkmnText += `╰┈➤ ${pName ? `${pName} (Lv. ${pLvl})${pGim ? ` [${pGim}]` : ""}` : "Vazio"}\n`;
-        }
-        const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎\n- Nome: ${d('t-name')}\n- Sexo: ${d('t-sex')}\n- Idade: ${d('t-age')}\n- Dinheiro: ₽ ${d('t-money')}\n\n━━━━❰BOLSA❱━━━━\n${bagText}\n━━━━▣━━◤POKÉMONS◢━━▣━━━━━\n${pkmnText}`;
-        const res = document.getElementById('convert-result');
-        res.innerText = template; res.style.display = 'block';
-    }
-
-    async function cloudAction(type) {
-        const user = document.getElementById('user-id').value;
-        const pass = document.getElementById('user-pass').value;
-        if(!user || !pass) return alert("Preencha o acesso.");
-        if(type === 'save') {
-            const sheet = {}; document.querySelectorAll('.save').forEach(el => sheet[el.id] = el.value);
-            const { error } = await _supabase.from('fichas').upsert({ username: user, password: pass, data: sheet, avatar: document.getElementById('main-avatar').src }, { onConflict: 'username' });
-            if(error) alert(error.message); else alert("Sincronizado!");
-        } else {
-            const { data } = await _supabase.from('fichas').select('*').eq('username', user).single();
-            if(data && data.password === pass) {
-                Object.keys(data.data).forEach(id => { const el = document.getElementById(id); if(el) el.value = data.data[id]; });
-                if(data.avatar) { const img = document.getElementById('main-avatar'); img.src = data.avatar; img.style.display='block'; document.getElementById('placeholder').style.display='none'; }
-                updateCities();
-                document.getElementById('t-city').value = data.data['t-city'];
-                for(let i=1; i<=6; i++) { 
-                    if(data.data[`p${i}-name`]) selectPkmn(i, data.data[`p${i}-name`].toLowerCase().replace(/ /g, '-'), data.data);
-                    updateGimmickIcon(i);
-                }
-                alert("Carregado!");
-            } else alert("Acesso negado.");
-        }
-    }
-
-    document.getElementById('file-input').onchange = (e) => {
-        if(!e.target.files.length) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = document.getElementById('image-to-crop'); img.src = event.target.result;
-            document.getElementById('crop-modal').style.display = 'flex';
-            if(cropper) cropper.destroy();
-            cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1 });
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    };
-
-    function finishCrop() {
-        const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
-        const mainImg = document.getElementById('main-avatar');
-        mainImg.src = canvas.toDataURL(); mainImg.style.display = 'block';
-        document.getElementById('placeholder').style.display = 'none';
-        document.getElementById('crop-modal').style.display = 'none';
+        const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+        const d = await r.json();
+        const img = document.getElementById(`img-${slot}`);
+        img.src = d.sprites.front_default;
+        img.style.display = "block";
     }
 
     init();
