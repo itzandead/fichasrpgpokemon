@@ -80,3 +80,993 @@
             cursor: pointer; transition: 0.3s; min-width: 180px; opacity: 0.5; flex: 1; max-width: 250px;
         }
         .char-slot.active { border-color: var(--secondary); opacity: 1; background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+        .char-slot img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #000; border: 1px solid var(--border); }
+        .char-info { display: flex; flex-direction: column; overflow: hidden; }
+        .char-name { font-weight: 800; font-size: 0.75rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .char-label { font-size: 0.55rem; color: var(--text-dim); text-transform: uppercase; }
+
+        .tabs-nav { display: flex; gap: 10px; margin-bottom: -10px; overflow-x: auto; }
+        .tab-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 25px; border-radius: 15px 15px 0 0; cursor: pointer; font-weight: 700; transition: 0.3s; white-space: nowrap; }
+        .tab-btn.active { background: var(--secondary); color: white; border-bottom: none; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: flex; flex-direction: column; gap: 25px; }
+
+        .section-tag { display: flex; align-items: center; gap: 10px; margin-bottom: -10px; }
+        .section-tag h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
+        .line { height: 1px; flex: 1; background: var(--border); }
+
+        .panel { background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 24px; padding: 20px; }
+        .trainer-header { display: flex; gap: 25px; flex-direction: column; align-items: center; }
+        
+        .avatar-box { 
+            width: 140px; height: 140px; border-radius: 50%; 
+            background: #000; border: 3px solid var(--border); 
+            overflow: hidden; display: flex; 
+            align-items: center; justify-content: center; position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: 0.3s;
+        }
+        .avatar-box:hover { border-color: var(--secondary); transform: scale(1.05); }
+        .avatar-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+        .form-grid { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .full-width { grid-column: span 2; }
+        label { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
+
+        input, select, textarea { background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 12px; font-size: 0.85rem; width: 100%; transition: 0.3s; }
+        input:focus { border-color: var(--secondary); outline: none; background: rgba(0,0,0,0.4); }
+
+        .bag-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .bag-sprite { 
+            width: 50px; height: 45px; 
+            background-image: url('https://i.ibb.co/SwH03wrc/Pt-bag.png');
+            background-repeat: no-repeat; background-size: 100px 45px; 
+            image-rendering: pixelated; transition: background-position 0.2s steps(1);
+        }
+        .bag-male { background-position: 0px 0px; }
+        .bag-female { background-position: -50px 0px; }
+
+        .money-card { 
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0,0,0,0.3));
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 16px; padding: 12px 18px; display: flex; align-items: center; gap: 15px;
+            width: fit-content; min-width: 200px; margin-top: 15px;
+        }
+        .money-symbol { font-family: 'Unbounded'; font-size: 1.5rem; color: var(--money); text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+        .money-input-wrapper { flex: 1; }
+        .money-input-wrapper input { background: transparent; border: none; padding: 0; font-size: 1.2rem; font-weight: 800; color: var(--money); width: 100%; }
+
+        /* POKEMON CARD STYLES */
+        .team-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .pkmn-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 22px; padding: 15px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+        .pkmn-header { display: flex; gap: 12px; align-items: center; }
+        .sprite-frame { width: 85px; height: 85px; background: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .pkmn-img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.35); image-rendering: pixelated; position: absolute; top: 0; left: 0; }
+        
+        /* ANIMACAO EVOLUCAO */
+        @keyframes evo-flash-anim {
+            0% { filter: brightness(1); transform: scale(1); }
+            50% { filter: brightness(10) contrast(0); transform: scale(1.1); }
+            100% { filter: brightness(1); transform: scale(1); }
+        }
+        .evo-flash { animation: evo-flash-anim 1.5s ease-in-out; }
+
+        .gimmick-badge { position: absolute; bottom: 5px; right: 5px; width: 28px; height: 28px; background-size: contain; background-repeat: no-repeat; background-position: center; pointer-events: none; z-index: 10; filter: drop-shadow(0 0 2px black); }
+        .shiny-toggle { position: absolute; top: 5px; left: 5px; z-index: 15; font-size: 1.2rem; filter: grayscale(1); transition: 0.3s; }
+        .shiny-toggle.active { filter: grayscale(0) drop-shadow(0 0 5px var(--shiny)); }
+
+        .gender-selector { display: flex; gap: 5px; margin-top: 5px; flex-direction: column; }
+        .gender-btns-row { display: flex; gap: 5px; }
+        .gender-btn { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 5px; font-size: 0.9rem; color: var(--text-dim); transition: 0.3s; }
+        .gender-btn.active.male { background: var(--male); color: white; border-color: #93c5fd; }
+        .gender-btn.active.female { background: var(--female); color: white; border-color: #f9a8d4; }
+        .gender-btn.disabled { opacity: 0.1; pointer-events: none; }
+
+        .stats-container { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
+        .stat-row { display: grid; grid-template-columns: 80px 1fr 1fr 1fr; gap: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; }
+        .stat-label { font-size: 0.7rem; font-weight: 800; color: var(--text-dim); }
+        .stat-val { font-weight: 700; color: var(--accent); text-align: center; }
+        .points-badge { background: var(--secondary); padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; margin-bottom: 10px; display: inline-block; }
+
+        .search-area { position: relative; flex: 1; }
+        .results-box { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border-radius: 10px; z-index: 100; max-height: 150px; overflow-y: auto; display: none; border: 1px solid var(--secondary); }
+        .results-box div { padding: 10px; border-bottom: 1px solid var(--border); font-size: 0.85rem; display: flex; align-items: center; gap: 10px; }
+        .results-box div:hover { background: rgba(255,255,255,0.1); }
+        .results-box img { width: 24px; height: 24px; object-fit: contain; }
+
+        .btn { padding: 10px 15px; border-radius: 10px; border: none; font-weight: 700; text-transform: uppercase; font-size: 0.7rem; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+        .btn-green { background: var(--accent); color: #05080f; }
+        .btn-blue { background: var(--secondary); color: white; }
+        .btn-evolve { background: #a855f7; color: white; width: 100%; margin-top: 5px; font-size: 0.6rem; display: none; }
+        .btn-box { background: #64748b; color: white; margin-top: 10px; }
+        
+        .actions-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .btn-convert { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; width: 100%; padding: 15px; font-size: 0.9rem; }
+        .btn-pkmn-ficha { background: var(--secondary); color: white; margin-top: 10px; font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.2); }
+        
+        .result-box { display: none; margin-top: 15px; background: #000; color: var(--accent); padding: 15px; border-radius: 12px; border: 1px dashed var(--accent); font-family: monospace; white-space: pre-wrap; font-size: 0.8rem; overflow-x: auto; position: relative; }
+        .btn-copy-float { background: #334155; color: white; width: 100%; padding: 12px; font-size: 0.8rem; margin-top: 10px; border-radius: 10px; border: none; display: none; cursor: pointer; }
+
+        /* BOXES TAB */
+        .box-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+        .box-slot { background: rgba(0,0,0,0.3); border: 1px dashed var(--border); border-radius: 15px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 140px; }
+        .box-slot img { width: 60px; height: 60px; object-fit: contain; image-rendering: pixelated; }
+        .box-slot span { font-size: 0.7rem; font-weight: 700; margin-top: 5px; display: block; }
+
+        #crop-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+        .crop-wrap { width: 90vw; height: 90vw; max-width: 400px; max-height: 400px; background: #111; border-radius: 10px; overflow: hidden; }
+
+        /* MODAL EVOLUCAO LISTA */
+        #evo-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10001; align-items: center; justify-content: center; }
+        .evo-modal-content { background: var(--bg); border: 1px solid var(--secondary); padding: 25px; border-radius: 20px; max-width: 300px; text-align: center; }
+
+        @media (min-width: 768px) {
+            .trainer-header { flex-direction: row; align-items: center; }
+            .form-grid { grid-template-columns: repeat(4, 1fr); }
+            .team-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width: 1024px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
+    </style>
+</head>
+<body>
+
+<div id="notification-host"></div>
+
+<div class="container">
+    <div class="auth-bar">
+        <div class="logo-container">
+            <div class="logo">Pokémon: Aurélia</div>
+            <div class="pikachu-climb"></div>
+        </div>
+        <div class="auth-inputs">
+            <input type="text" id="user-id" placeholder="ID">
+            <div class="pass-container">
+                <input type="password" id="user-pass" placeholder="Senha">
+                <span class="toggle-pass" onclick="togglePassword()">👁️</span>
+            </div>
+            <div class="auth-buttons">
+                <button class="btn btn-green" onclick="cloudAction('save')">Salvar</button>
+                <button class="btn btn-blue" onclick="cloudAction('load')">Carregar</button>
+            </div>
+        </div>
+        
+        <div class="character-selector">
+            <div id="slot-btn-1" class="char-slot active" onclick="switchSlot(1)">
+                <img id="slot-img-1" src="https://i.ibb.co/SwH03wrc/Pt-bag.png">
+                <div class="char-info">
+                    <span class="char-label">Slot 1</span>
+                    <span id="slot-name-1" class="char-name">Vazio</span>
+                </div>
+            </div>
+            <div id="slot-btn-2" class="char-slot" onclick="switchSlot(2)">
+                <img id="slot-img-2" src="https://i.ibb.co/SwH03wrc/Pt-bag.png">
+                <div class="char-info">
+                    <span class="char-label">Slot 2</span>
+                    <span id="slot-name-2" class="char-name">Vazio</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="openTab('tab-trainer', this)">TREINADOR</button>
+        <button class="tab-btn" onclick="openTab('tab-pokemon', this)">TIME POKÉMON</button>
+        <button class="tab-btn" onclick="openTab('tab-boxes', this)">BOXES (PC)</button>
+    </div>
+
+    <div id="tab-trainer" class="tab-content active">
+        <div class="section-tag"><h2>Identificação</h2><div class="line"></div></div>
+        <div class="panel trainer-header">
+            <div class="avatar-wrapper">
+                <div onclick="document.getElementById('file-input').click()" class="avatar-box">
+                    <img id="main-avatar" style="display:none">
+                    <span id="placeholder" style="font-size:0.6rem; color:var(--text-dim); text-align:center; padding: 10px;">ADICIONAR FOTO</span>
+                </div>
+                <input type="file" id="file-input" hidden accept="image/*">
+            </div>
+            <div class="form-grid">
+                <div class="input-group full-width"><label>Nome</label><input type="text" id="t-name" class="save"></div>
+                <div class="input-group"><label>Sexo</label><select id="t-sex" class="save" onchange="updateBagIcon()"><option value="">-</option><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option><option value="Outro">Outro</option></select></div>
+                <div class="input-group"><label>Idade</label><input type="number" id="t-age" class="save" min="10"></div>
+                <div class="input-group"><label>Altura</label><input type="text" id="t-height" class="save" placeholder="Ex: 1.75"></div>
+                <div class="input-group"><label>Classe</label>
+                    <select id="t-class" class="save">
+                        <option value="Treinador (a)">Treinador (a)</option>
+                        <option value="Coordenador (a)">Coordenador (a)</option>
+                        <option value="Cuidador (a)">Cuidador (a)</option>
+                        <option value="Professor (a)">Professor (a)</option>
+                        <option value="Enfermeiro (a)">Enfermeiro (a)</option>
+                        <option value="Guarda">Guarda</option>
+                        <option value="Policial">Policial</option>
+                        <option value="Fotógrafo (a)">Fotógrafo (a)</option>
+                        <option value="Pesquisador (a)">Pesquisador (a)</option>
+                        <option value="Rocket">Rocket</option>
+                        <option value="Fazendeiro (a)">Fazendeiro (a)</option>
+                        <option value="Cientista">Cientista</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>Região</label><select id="t-region" class="save" onchange="updateCities()"></select></div>
+                <div class="input-group"><label>Cidade</label><select id="t-city" class="save"></select></div>
+                <div class="input-group full-width"><label>Aparência</label><input type="text" id="t-appearance" class="save"></div>
+            </div>
+        </div>
+
+        <div class="section-tag"><h2>Inventário</h2><div class="line"></div></div>
+        <div class="panel">
+            <div class="bag-header">
+                <div id="bag-icon-display" class="bag-sprite bag-male"></div>
+                <label>Mochila</label>
+            </div>
+            <textarea id="t-bag" class="save" rows="4" placeholder="Ex: 1 Pokeball, 1 Poção"></textarea>
+            <div class="money-card">
+                <div class="money-symbol">₽</div>
+                <div class="money-input-wrapper">
+                    <label>Saldo Atual</label>
+                    <input type="number" id="t-money" class="save" value="0">
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions-group">
+            <button class="btn btn-convert" onclick="convertSheet()">✨ GERAR FICHA EM TEXTO</button>
+            <div id="convert-result-trainer" class="result-box"></div>
+            <button id="copy-btn-trainer" class="btn-copy-float" onclick="copyToClipboard('convert-result-trainer')">📋 COPIAR PARA O CLIPBOARD</button>
+        </div>
+    </div>
+
+    <div id="tab-pokemon" class="tab-content">
+        <div class="section-tag"><h2>Gestão de Equipe</h2><div class="line"></div></div>
+        <div id="team" class="team-grid"></div>
+        <div class="actions-group">
+            <div id="convert-result-pokemon" class="result-box"></div>
+            <button id="copy-btn-pokemon" class="btn-copy-float" onclick="copyToClipboard('convert-result-pokemon')">📋 COPIAR FICHA DO POKÉMON</button>
+        </div>
+    </div>
+
+    <div id="tab-boxes" class="tab-content">
+        <div class="section-tag"><h2>Sistema de Boxes (Slots Infinitos)</h2><div class="line"></div></div>
+        <div class="panel">
+            <div id="boxes-container" class="box-grid"></div>
+        </div>
+    </div>
+</div>
+
+<div id="evo-modal">
+    <div class="evo-modal-content">
+        <h3 style="color:white; margin-bottom:15px;">Escolha a Evolução</h3>
+        <div id="evo-options-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+        <button class="btn" style="background:#444; color:white; margin-top:15px; width:100%;" onclick="document.getElementById('evo-modal').style.display='none'">CANCELAR</button>
+    </div>
+</div>
+
+<div id="crop-modal">
+    <h3 style="color:white; margin-bottom: 15px; font-family: 'Unbounded'">AJUSTAR AVATAR</h3>
+    <div class="crop-wrap"><img id="image-to-crop"></div>
+    <div style="margin-top:20px; display:flex; gap:10px;">
+        <button class="btn" style="background:#444; color:white;" onclick="document.getElementById('crop-modal').style.display='none'">CANCELAR</button>
+        <button class="btn btn-green" onclick="finishCrop()">FINALIZAR</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<script>
+    const SUPABASE_URL = 'https://pjggfdjixenopkiiugmj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZ2dmZGppeGVub3BraWl1Z21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMjIwMDcsImV4cCI6MjA5MTY5ODAwN30.QWr9d3qT2216to7VOEmc_hzu-g789FTLdYdDUtUosk0';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allPkmn = [];
+    let allItems = [];
+    let pkmnFullData = {}; 
+    let moveCache = {};
+    let cropper;
+    
+    // VARIÁVEIS DE SLOTS
+    let currentSlot = 1;
+    let boxes = []; // Esta será trocada ao mudar de slot
+    let accountData = {
+        slot1: { data: {}, avatar: "" },
+        slot2: { data: {}, avatar: "" }
+    };
+
+    const natures = {
+        'Adamant': {plus: 'atk', minus: 'spa'}, 'Bold': {plus: 'def', minus: 'atk'}, 'Brave': {plus: 'atk', minus: 'spe'},
+        'Calm': {plus: 'spd', minus: 'atk'}, 'Careful': {plus: 'spd', minus: 'spa'}, 'Gentle': {plus: 'spd', minus: 'def'},
+        'Hasty': {plus: 'spe', minus: 'def'}, 'Impish': {plus: 'def', minus: 'spa'}, 'Jolly': {plus: 'spe', minus: 'spa'},
+        'Lonely': {plus: 'atk', minus: 'def'}, 'Mild': {plus: 'spa', minus: 'def'}, 'Modest': {plus: 'spa', minus: 'atk'},
+        'Naive': {plus: 'spe', minus: 'spd'}, 'Naughty': {plus: 'atk', minus: 'spd'}, 'Quiet': {plus: 'spa', minus: 'spe'},
+        'Rash': {plus: 'spa', minus: 'spd'}, 'Relaxed': {plus: 'def', minus: 'spe'}, 'Sassy': {plus: 'spd', minus: 'spe'},
+        'Timid': {plus: 'spe', minus: 'atk'}, 'Hardy': {plus: null, minus: null}, 'Docile': {plus: null, minus: null},
+        'Serious': {plus: null, minus: null}, 'Bashful': {plus: null, minus: null}, 'Quirky': {plus: null, minus: null}
+    };
+
+    const gimmicks = {
+        "Mega": "https://i.ibb.co/3510nxGs/key-stone-by-jormxdos-dfftdg1-414w.png",
+        "Z-Move": "https://i.ibb.co/0RCRx7VG/z-ring-icon-by-jormxdos-dffutkv-fullview.png",
+        "Dynamax": "https://i.ibb.co/K1t5pYy/gigantamax-icon-by-jormxdos-dffv4gc-fullview.png",
+        "Tera": "https://i.ibb.co/4ZzfQZ5c/terastal-phenomenon-icon-by-jormxdos-dffvs1r-fullview.png"
+    };
+
+    const worldData = {
+        "Kanto": ["Pallet Town", "Viridian City", "Pewter City", "Cerulean City", "Vermilion City", "Lavender Town", "Celadon City", "Fuchsia City", "Saffron City", "Cinnabar Island"],
+        "Johto": ["New Bark Town", "Cherrygrove City", "Violet City", "Azalea Town", "Goldenrod City", "Ecruteak City", "Olivine City", "Cianwood City", "Mahogany Town", "Blackthorn City"],
+        "Hoenn": ["Littleroot Town", "Oldale Town", "Petalburg City", "Rustboro City", "Dewford Town", "Slateport City", "Mauville City", "Verdanturf Town", "Fallarbor Town", "Lavaridge Town", "Fortree City", "Lilycove City", "Mossdeep City", "Sootopolis City"],
+        "Sinnoh": ["Twinleaf Town", "Sandgem Town", "Jubilife City", "Oreburgh City", "Floaroma Town", "Eterna City", "Hearthome City", "Solaceon Town", "Veilstone City", "Pastoria City", "Celestic Town", "Canalave City", "Snowpoint City", "Sunyshore City"],
+        "Unova": ["Nuvema Town", "Accumula Town", "Striaton City", "Nacrene City", "Castelia City", "Nimbasa City", "Driftveil City", "Mistralton City", "Icirrus City", "Opelucid City", "Humilau City"],
+        "Kalos": ["Vaniville Town", "Santalune City", "Lumiose City", "Camphrier Town", "Cyllage City", "Ambrette Town", "Shalour City", "Coumarine City", "Laverre City", "Dendemille Town", "Anistar City", "Snowbelle City"],
+        "Alola": ["Hau'oli City", "Heahea City", "Konikoni City", "Malie City", "Tapu Village", "Seafolk Village"],
+        "Galar": ["Postwick", "Wedgehurst", "Motostoke", "Turffield", "Hulbury", "Hammerlocke", "Stow-on-Side", "Ballonlea", "Circhester", "Spikemuth", "Wyndon"],
+        "Paldea": ["Cabo Poco", "Mesagoza", "Cortondo", "Artazon", "Levincia", "Cascarrafa", "Porto Marinada", "Medali", "Montenevera", "Alfornada", "Glaseado"]
+    };
+
+    function format(str) { return str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+
+    function showNotify(msg, type = 'info') {
+        const host = document.getElementById('notification-host');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<span>${msg}</span>`;
+        host.appendChild(toast);
+        setTimeout(() => { toast.style.animation = "slideIn 0.3s ease-in reverse forwards"; setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    function togglePassword() {
+        const pass = document.getElementById('user-pass');
+        pass.type = pass.type === 'password' ? 'text' : 'password';
+    }
+
+    function openTab(id, btn) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+        if(id === 'tab-trainer') updateBagIcon(); 
+        if(id === 'tab-boxes') renderBoxes();
+    }
+
+    function updateBagIcon() {
+        const sex = document.getElementById('t-sex').value;
+        const icon = document.getElementById('bag-icon-display');
+        icon.classList.remove('bag-male', 'bag-female');
+        if (sex === "Masculino") icon.classList.add('bag-male');
+        else if (sex === "Feminino") icon.classList.add('bag-female');
+        else icon.classList.add('bag-male');
+    }
+
+    function fastScroll() {
+        setTimeout(() => { window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }); }, 50); 
+    }
+
+    async function init() {
+        const regSelect = document.getElementById('t-region');
+        regSelect.innerHTML = '<option value="">Região...</option>';
+        Object.keys(worldData).forEach(r => regSelect.innerHTML += `<option value="${r}">${r}</option>`);
+        renderSlots();
+        updateBagIcon();
+        try {
+            const [pr, ir] = await Promise.all([
+                fetch('https://pokeapi.co/api/v2/pokemon?limit=10000'),
+                fetch('https://pokeapi.co/api/v2/item?limit=2000')
+            ]);
+            allPkmn = (await pr.json()).results;
+            allItems = (await ir.json()).results;
+        } catch(e) {}
+    }
+
+    function renderSlots() {
+        const team = document.getElementById('team'); team.innerHTML = "";
+        for(let i=1; i<=6; i++) {
+            team.innerHTML += `
+            <div class="pkmn-card" id="pk-card-${i}">
+                <span id="p${i}-shiny-btn" class="shiny-toggle" onclick="toggleShiny(${i})">✨</span>
+                <input type="hidden" id="p${i}-is-shiny" value="false" class="save">
+                <input type="hidden" id="p${i}-gender" value="Indefinido" class="save">
+                <input type="hidden" id="p${i}-stage" value="0" class="save">
+                <div class="pkmn-header">
+                    <div class="sprite-frame"><img id="img-${i}" class="pkmn-img" style="display:none"><div id="gim-badge-${i}" class="gimmick-badge"></div></div>
+                    <div class="search-area">
+                        <label>Pokémon #${i}</label>
+                        <input type="text" id="p${i}-name" class="save" oninput="doSearch(${i})" placeholder="Espécie...">
+                        <div id="drop-${i}" class="results-box"></div>
+                        <div class="gender-selector">
+                            <div class="gender-btns-row">
+                                <button id="p${i}-btn-m" class="gender-btn male" onclick="setGender(${i}, 'Macho')">♂</button>
+                                <button id="p${i}-btn-f" class="gender-btn female" onclick="setGender(${i}, 'Fêmea')">♀</button>
+                            </div>
+                            <button id="p${i}-evo-btn" class="btn btn-evolve" onclick="prepareEvolution(${i})">EVOLUIR</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
+                    <div class="input-group"><label>Apelido</label><input type="text" id="p${i}-nick" class="save" placeholder="Apelido..."></div>
+                    <div class="input-group"><label>Habilidade</label><select id="p${i}-ability" class="save"><option value="">Habilidade</option></select></div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
+                    <div class="search-area"><label>Item</label><input type="text" id="p${i}-item" class="save" oninput="doItemSearch(${i})" placeholder="Item..."><div id="drop-item-${i}" class="results-box"></div></div>
+                    <div class="input-group"><label>Pokébola</label><input type="text" id="p${i}-ball" class="save" value="Padrão"></div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px">
+                    <div class="input-group"><label>Amizade</label><input type="number" id="p${i}-friend" class="save" value="0" min="0" max="255"></div>
+                    <div class="input-group"><label>Level</label><input type="number" id="p${i}-lvl" class="save" value="5" min="1" max="100" onchange="calcStats(${i}); updateMoves(${i});"></div>
+                    <div class="input-group"><label>XP Atual</label><input type="text" id="p${i}-xp" class="save" placeholder=""></div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
+                    <div class="input-group"><label>Nature</label><select id="p${i}-nature" class="save" onchange="calcStats(${i})"><option value="">Nature</option>${Object.keys(natures).map(n=>`<option value="${n}">${n}</option>`).join('')}</select></div>
+                    <div class="input-group"><label>Gimmick</label><select id="p${i}-gim" class="save" onchange="updateGimmickIcon(${i})"><option value="">Nenhuma</option><option value="Mega">Mega</option><option value="Z-Move">Z-Move</option><option value="Dynamax">Dynamax</option><option value="Tera">Tera</option></select></div>
+                </div>
+                <div class="stats-container">
+                    <div class="points-badge">Pontos Disponíveis: <span id="p${i}-pts">0</span></div>
+                    ${['hp', 'atk', 'def', 'spa', 'spd', 'spe'].map(s => `<div class="stat-row"><span class="stat-label">${s.toUpperCase()}</span><input type="number" id="p${i}-base-${s}" class="save" placeholder="Base" readonly><input type="number" id="p${i}-up-${s}" class="save" placeholder="Add" onchange="calcStats(${i})"><span id="p${i}-total-${s}" class="stat-val">0</span></div>`).join('')}
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px">
+                    <select id="p${i}-m1" class="save"></select><select id="p${i}-m2" class="save"></select>
+                    <select id="p${i}-m3" class="save"></select><select id="p${i}-m4" class="save"></select>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr; gap:5px;">
+                    <button class="btn btn-box" onclick="moveToBox(${i})">GUARDAR BOX</button>
+                </div>
+                <button class="btn btn-pkmn-ficha" onclick="convertPkmnFicha(${i})">GERAR FICHA DE POKÉMON</button>
+            </div>`;
+        }
+    }
+
+    // LOGICA DE TROCA DE SLOTS
+    function switchSlot(num) {
+        captureCurrentDataToObject();
+        currentSlot = num;
+        document.getElementById('slot-btn-1').classList.toggle('active', num === 1);
+        document.getElementById('slot-btn-2').classList.toggle('active', num === 2);
+        applyObjectToScreen();
+        showNotify(`Trocado para Slot ${num}`);
+    }
+
+    function captureCurrentDataToObject() {
+        let current = accountData[`slot${currentSlot}`];
+        current.data = { boxes: [...boxes] };
+        document.querySelectorAll('.save').forEach(el => {
+            current.data[el.id] = el.value;
+        });
+        current.avatar = document.getElementById('main-avatar').src;
+    }
+
+    async function applyObjectToScreen() {
+        let current = accountData[`slot${currentSlot}`];
+        
+        // Se o slot estiver vazio, limpa a tela
+        if (!current.data['t-name']) {
+            document.querySelectorAll('.save').forEach(el => {
+                if(el.tagName === 'SELECT') el.selectedIndex = 0;
+                else el.value = el.defaultValue || "";
+            });
+            document.getElementById('main-avatar').style.display = 'none';
+            document.getElementById('placeholder').style.display = 'block';
+            boxes = [];
+            renderSlots();
+            renderBoxes();
+            updateBagIcon();
+            return;
+        }
+
+        // Restaura Dados
+        boxes = current.data.boxes || [];
+        Object.keys(current.data).forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.value = current.data[id];
+        });
+
+        // Restaura Avatar
+        const img = document.getElementById('main-avatar');
+        if(current.avatar && current.avatar.startsWith('data:image')) {
+            img.src = current.avatar;
+            img.style.display='block';
+            document.getElementById('placeholder').style.display='none';
+        } else {
+            img.style.display='none';
+            document.getElementById('placeholder').style.display='block';
+        }
+
+        // Restaura Cidades e Pokémon
+        updateCities();
+        if(current.data['t-city']) document.getElementById('t-city').value = current.data['t-city'];
+        updateBagIcon();
+        
+        for(let i=1; i<=6; i++) {
+            if(current.data[`p${i}-name`]) {
+                await selectPkmn(i, current.data[`p${i}-name`].toLowerCase().replace(/ /g, '-'), current.data);
+                document.getElementById(`p${i}-shiny-btn`).classList.toggle('active', current.data[`p${i}-is-shiny`] === 'true');
+                updateGimmickIcon(i);
+                setGender(i, current.data[`p${i}-gender`]);
+            } else {
+                document.getElementById(`p${i}-name`).value = "";
+                document.getElementById(`img-${i}`).style.display = "none";
+                document.getElementById(`p${i}-evo-btn`).style.display = "none";
+            }
+            calcStats(i);
+        }
+        renderBoxes();
+    }
+
+    function updateSelectors() {
+        [1, 2].forEach(num => {
+            const slot = accountData[`slot${num}`];
+            if (slot.data && slot.data['t-name']) {
+                document.getElementById(`slot-name-${num}`).innerText = slot.data['t-name'];
+                if (slot.avatar) document.getElementById(`slot-img-${num}`).src = slot.avatar;
+            } else {
+                document.getElementById(`slot-name-${num}`).innerText = "Vazio";
+                document.getElementById(`slot-img-${num}`).src = "https://i.ibb.co/SwH03wrc/Pt-bag.png";
+            }
+        });
+    }
+
+    function setGender(slot, gender) {
+        document.getElementById(`p${slot}-gender`).value = gender;
+        document.getElementById(`p${slot}-btn-m`).classList.toggle('active', gender === 'Macho');
+        document.getElementById(`p${slot}-btn-f`).classList.toggle('active', gender === 'Fêmea');
+    }
+
+    function toggleShiny(slot) {
+        const hiddenInput = document.getElementById(`p${slot}-is-shiny`);
+        const btn = document.getElementById(`p${slot}-shiny-btn`);
+        const isShiny = hiddenInput.value === 'true';
+        hiddenInput.value = !isShiny;
+        btn.classList.toggle('active', !isShiny);
+        if (pkmnFullData[slot]) updatePkmnImage(slot, pkmnFullData[slot], !isShiny);
+    }
+
+    function updatePkmnImage(slot, data, isShiny) {
+        const img = document.getElementById(`img-${slot}`);
+        const artwork = data.sprites.other['official-artwork'];
+        img.src = isShiny ? (artwork.front_shiny || data.sprites.front_shiny) : (artwork.front_default || data.sprites.front_default);
+        img.style.display = "block";
+    }
+
+    function calcStats(slot) {
+        const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 5;
+        const nature = natures[document.getElementById(`p${slot}-nature`).value] || {plus: null, minus: null};
+        const hasEvolutions = pkmnFullData[slot]?.hasEvolutions !== false; 
+        
+        let used = 0;
+        ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].forEach(s => {
+            const base = parseInt(document.getElementById(`p${slot}-base-${s}`).value) || 0;
+            const up = parseInt(document.getElementById(`p${slot}-up-${s}`).value) || 0;
+            used += up;
+            let mult = 1.0;
+            if(nature.plus === s) mult += 0.1; if(nature.minus === s) mult -= 0.1;
+            mult += (Math.floor(up / 10) * 0.01);
+            const total = Math.floor((base + up) * mult);
+            const d = document.getElementById(`p${slot}-total-${s}`);
+            if(d) {
+                d.innerText = total; d.style.color = mult > 1 ? '#10b981' : (mult < 1 ? '#ff3e3e' : '#f1f5f9');
+            }
+        });
+        
+        const ptsPerLevel = hasEvolutions ? 5 : 10;
+        const pts = document.getElementById(`p${slot}-pts`);
+        if(pts) {
+            pts.innerText = ((lvl - 5) * ptsPerLevel) - used;
+            pts.style.color = (parseInt(pts.innerText) < 0) ? '#ff3e3e' : '#10b981';
+        }
+    }
+
+    async function prepareEvolution(slot) {
+        const pkName = document.getElementById(`p${slot}-name`).value.toLowerCase().replace(/ /g, '-');
+        const currentLvl = parseInt(document.getElementById(`p${slot}-lvl`).value);
+        const currentItem = document.getElementById(`p${slot}-item`).value.toLowerCase();
+        
+        if(!pkName) return;
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pkName}`);
+            const speciesData = await res.json();
+            const chainRes = await fetch(speciesData.evolution_chain.url);
+            const chainData = await chainRes.json();
+            
+            let current = findNodeInChain(chainData.chain, pkName);
+
+            if(current && current.evolves_to.length > 0) {
+                const list = document.getElementById('evo-options-list');
+                list.innerHTML = "";
+                
+                current.evolves_to.forEach(evo => {
+                    let canEvolve = true;
+                    let reason = "";
+                    
+                    const trigger = evo.evolution_details[0];
+                    if(trigger) {
+                        if(trigger.min_level && currentLvl < trigger.min_level) {
+                            canEvolve = false;
+                            reason = ` (Nv. ${trigger.min_level})`;
+                        }
+                        if(trigger.item && currentItem !== format(trigger.item.name).toLowerCase()) {
+                            canEvolve = false;
+                            reason = ` (Equipe ${format(trigger.item.name)})`;
+                        }
+                        if(trigger.held_item && currentItem !== format(trigger.held_item.name).toLowerCase()) {
+                            canEvolve = false;
+                            reason = ` (Equipe ${format(trigger.held_item.name)})`;
+                        }
+                    }
+
+                    let evoSpeciesName = evo.species.name;
+                    
+                    const btn = document.createElement('button');
+                    btn.className = "btn btn-blue";
+                    btn.innerText = format(evoSpeciesName) + reason;
+                    if(!canEvolve) {
+                        btn.style.opacity = "0.5";
+                        btn.onclick = () => showNotify(`Requisito ausente: ${reason}`, "error");
+                    } else {
+                        btn.onclick = () => executeEvolution(slot, evoSpeciesName, current.evolves_to.length === 1);
+                    }
+                    list.appendChild(btn);
+                });
+                document.getElementById('evo-modal').style.display = 'flex';
+            } else {
+                showNotify("Este Pokémon não possui mais evoluções.");
+            }
+        } catch(e) { showNotify("Erro ao buscar evoluções."); }
+    }
+
+    function findNodeInChain(node, name) {
+        if(node.species.name === name) return node;
+        for(let next of node.evolves_to) {
+            let found = findNodeInChain(next, name);
+            if(found) return found;
+        }
+        return null;
+    }
+
+    async function executeEvolution(slot, nextSpecies, isSinglePath) {
+        document.getElementById('evo-modal').style.display = 'none';
+        
+        if(nextSpecies === "lycanroc") {
+            const list = document.getElementById('evo-options-list');
+            list.innerHTML = '<h4 style="color:white; margin-bottom:10px">Escolha a Forma</h4>';
+            ["lycanroc-midday", "lycanroc-midnight", "lycanroc-dusk"].forEach(form => {
+                const btn = document.createElement('button');
+                btn.className = "btn btn-blue";
+                btn.innerText = format(form);
+                btn.onclick = () => finishEvolution(slot, form, isSinglePath);
+                list.appendChild(btn);
+            });
+            document.getElementById('evo-modal').style.display = 'flex';
+            return;
+        }
+
+        finishEvolution(slot, nextSpecies, isSinglePath);
+    }
+
+    async function finishEvolution(slot, nextSpecies, isSinglePath) {
+        document.getElementById('evo-modal').style.display = 'none';
+        const img = document.getElementById(`img-${slot}`);
+        img.classList.add('evo-flash');
+        
+        setTimeout(async () => {
+            const stage = parseInt(document.getElementById(`p${slot}-stage`).value) || 0;
+            let perc = (isSinglePath || stage > 0) ? 0.30 : 0.20;
+
+            ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].forEach(s => {
+                const baseEl = document.getElementById(`p${slot}-base-${s}`);
+                const total = parseInt(document.getElementById(`p${slot}-total-${s}`).innerText);
+                const bonus = Math.floor(total * perc);
+                baseEl.value = parseInt(baseEl.value) + bonus;
+            });
+
+            document.getElementById(`p${slot}-stage`).value = stage + 1;
+            await selectPkmn(slot, nextSpecies, null, true);
+            img.classList.remove('evo-flash');
+            showNotify("Pokémon evoluído!", "success");
+        }, 1500);
+    }
+
+    function moveToBox(slot) {
+        const pkData = {};
+        document.querySelectorAll(`[id^="p${slot}-"]`).forEach(el => {
+            if(el.classList.contains('save')) pkData[el.id.replace(`p${slot}-`, '')] = el.value;
+        });
+        pkData.sprite = document.getElementById(`img-${slot}`).src;
+        if(!pkData.name) return showNotify("Slot vazio!", "error");
+        
+        boxes.push(pkData);
+        document.getElementById(`p${slot}-name`).value = "";
+        document.getElementById(`img-${slot}`).style.display = "none";
+        document.getElementById(`p${slot}-evo-btn`).style.display = "none";
+        renderBoxes();
+        showNotify("Pokémon enviado para o Box.");
+    }
+
+    function renderBoxes() {
+        const container = document.getElementById('boxes-container');
+        container.innerHTML = "";
+        boxes.forEach((p, idx) => {
+            const div = document.createElement('div');
+            div.className = "box-slot";
+            div.innerHTML = `<img src="${p.sprite}"><span>${p.nick || p.name}</span>`;
+            div.onclick = () => pullFromBox(idx);
+            container.appendChild(div);
+        });
+    }
+
+    function pullFromBox(idx) {
+        let slot = -1;
+        for(let i=1; i<=6; i++) { if(!document.getElementById(`p${i}-name`).value) { slot = i; break; } }
+        if(slot === -1) return showNotify("Equipe cheia!", "error");
+
+        const data = boxes[idx];
+        boxes.splice(idx, 1);
+        restorePokemonSlot(slot, data);
+        renderBoxes();
+        showNotify("Pokémon retirado do Box.");
+    }
+
+    async function restorePokemonSlot(slot, data) {
+        for(let key in data) {
+            const el = document.getElementById(`p${slot}-${key}`);
+            if(el) el.value = data[key];
+        }
+        await selectPkmn(slot, data.name.toLowerCase().replace(/ /g, '-'), data, true);
+        calcStats(slot);
+    }
+
+    function updateGimmickIcon(slot) {
+        const val = document.getElementById(`p${slot}-gim`).value;
+        const b = document.getElementById(`gim-badge-${slot}`);
+        if(val && gimmicks[val]) { b.style.backgroundImage = `url('${gimmicks[val]}')`; b.style.display = 'block'; } else b.style.display = 'none';
+    }
+
+    function updateCities() {
+        const r = document.getElementById('t-region').value;
+        const s = document.getElementById('t-city');
+        const cur = s.value; s.innerHTML = '<option value="">Cidade...</option>';
+        if(worldData[r]) worldData[r].forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+        if(cur) s.value = cur;
+    }
+
+    function doSearch(slot) {
+        const q = document.getElementById(`p${slot}-name`).value.toLowerCase().replace(/ /g, '-');
+        const drop = document.getElementById(`drop-${slot}`); drop.innerHTML = "";
+        if(q.length < 2) return drop.style.display="none";
+        const hits = allPkmn.filter(p => p.name.includes(q)).slice(0, 10);
+        if(hits.length) {
+            drop.style.display="block";
+            hits.forEach(p => {
+                const id = p.url.split('/')[6];
+                const d = document.createElement('div');
+                d.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png"> <span>${format(p.name)}</span>`;
+                d.onclick = () => selectPkmn(slot, p.name);
+                drop.appendChild(d);
+            });
+        }
+    }
+
+    async function selectPkmn(slot, name, restoreData = null, isEvo = false) {
+        document.getElementById(`p${slot}-name`).value = format(name);
+        document.getElementById(`drop-${slot}`).style.display = "none";
+        try {
+            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+            const d = await r.json();
+            pkmnFullData[slot] = d;
+            
+            const specRes = await fetch(d.species.url);
+            const specData = await specRes.json();
+            
+            const chainRes = await fetch(specData.evolution_chain.url);
+            const chainData = await chainRes.json();
+            
+            let currentInChain = findNodeInChain(chainData.chain, specData.name);
+            const hasEvolutions = currentInChain && currentInChain.evolves_to.length > 0;
+            pkmnFullData[slot].hasEvolutions = hasEvolutions;
+
+            document.getElementById(`p${slot}-evo-btn`).style.display = hasEvolutions ? "block" : "none";
+
+            const gRate = specData.gender_rate;
+            const btnM = document.getElementById(`p${slot}-btn-m`);
+            const btnF = document.getElementById(`p${slot}-btn-f`);
+            btnM.classList.remove('disabled'); btnF.classList.remove('disabled');
+            if(gRate === -1) { btnM.classList.add('disabled'); btnF.classList.add('disabled'); setGender(slot, 'Indefinido'); }
+            else if(gRate === 8) { btnM.classList.add('disabled'); setGender(slot, 'Fêmea'); }
+            else if(gRate === 0) { btnF.classList.add('disabled'); setGender(slot, 'Macho'); }
+            else { if(!restoreData && !isEvo) setGender(slot, 'Macho'); }
+            
+            updatePkmnImage(slot, d, document.getElementById(`p${slot}-is-shiny`).value === 'true');
+            
+            const ab = document.getElementById(`p${slot}-ability`);
+            const oldAb = ab.value;
+            ab.innerHTML = '<option value="">Habilidade</option>';
+            d.abilities.forEach(a => ab.innerHTML += `<option value="${format(a.ability.name)}">${format(a.ability.name)}</option>`);
+            
+            if (restoreData) { 
+                if(restoreData[`p${slot}-ability`]) ab.value = restoreData[`p${slot}-ability`]; 
+                setGender(slot, restoreData[`p${slot}-gender`]); 
+            }
+            else if(isEvo) { ab.value = oldAb; }
+
+            if(!restoreData && !isEvo) { 
+                d.stats.forEach((s, idx) => { const map = ['hp', 'atk', 'def', 'spa', 'spd', 'spe']; document.getElementById(`p${slot}-base-${map[idx]}`).value = s.base_stat; }); 
+            }
+            
+            calcStats(slot);
+            moveCache[slot] = d.moves; 
+            updateMoves(slot, restoreData);
+        } catch(e) {}
+    }
+
+    function doItemSearch(slot) {
+        const q = document.getElementById(`p${slot}-item`).value.toLowerCase().replace(/ /g, '-');
+        const drop = document.getElementById(`drop-item-${slot}`); drop.innerHTML = "";
+        if(q.length < 2) return drop.style.display="none";
+        const hits = allItems.filter(i => i.name.includes(q)).slice(0, 10);
+        if(hits.length) {
+            drop.style.display="block";
+            hits.forEach(item => {
+                const d = document.createElement('div');
+                d.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item.name}.png" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'"> <span>${format(item.name)}</span>`;
+                d.onclick = () => { document.getElementById(`p${slot}-item`).value = format(item.name); drop.style.display = "none"; calcStats(slot); };
+                drop.appendChild(d);
+            });
+        }
+    }
+
+    function updateMoves(slot, restoreData = null) {
+        const moves = moveCache[slot]; if(!moves) return;
+        const lvl = parseInt(document.getElementById(`p${slot}-lvl`).value) || 5;
+        
+        const avail = moves.filter(m => m.version_group_details.some(vd => 
+            (vd.move_learn_method.name === 'level-up' && vd.level_learned_at <= lvl) || 
+            (vd.move_learn_method.name === 'egg')
+        )).map(m => m.move.name);
+        
+        const unique = [...new Set(avail)].map(format).sort();
+        for(let i=1; i<=4; i++) {
+            const s = document.getElementById(`p${slot}-m${i}`);
+            const cur = s.value; s.innerHTML = '<option value="">Golpe</option>';
+            unique.forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
+            if(restoreData && restoreData[`p${slot}-m${i}`]) s.value = restoreData[`p${slot}-m${i}`]; else s.value = cur;
+        }
+    }
+
+    function convertSheet() {
+        const d = (id) => document.getElementById(id).value || "---";
+        const rawBag = document.getElementById('t-bag').value;
+        const bagItems = rawBag.split(/[\n,]+/).map(item => item.trim()).filter(item => item !== "");
+        
+        let bagText = ""; 
+        if(bagItems.length > 0) {
+            bagItems.forEach(item => { bagText += `╰┈➤ ${item}\n`; });
+        } else {
+            bagText = `╰┈➤ \n`;
+        }
+
+        let pkmnText = "";
+        for(let i=1; i<=6; i++) {
+            const pName = document.getElementById(`p${i}-name`).value;
+            const pNick = document.getElementById(`p${i}-nick`).value;
+            const pLvl = document.getElementById(`p${i}-lvl`).value;
+            if(pName) {
+                pkmnText += `╰┈➤ ${pNick || pName} (Lv. ${pLvl})${document.getElementById(`p${i}-is-shiny`).value === 'true' ? ' ✨' : ''}\n`;
+            } else {
+                pkmnText += `╰┈➤ Vazio\n`;
+            }
+        }
+
+        const template = `‎‧₊˚✧Ficha do Treinador✧˚₊‧‎\n\n` +
+            `- Nome: ${d('t-name')}\n` +
+            `- Sexo: ${d('t-sex')}\n` +
+            `- Idade: ${d('t-age')}\n` +
+            `- Altura: ${d('t-height')}\n` +
+            `- Dinheiro: ₽ ${d('t-money')}\n\n` +
+            `━━━━❰BOLSA❱━━━━\n` +
+            `${bagText}\n` +
+            `━━━━▣━━◤POKÉMONS◢━━▣━━━━━\n` +
+            `${pkmnText}`;
+
+        const res = document.getElementById('convert-result-trainer');
+        res.innerText = template; res.style.display = 'block';
+        document.getElementById('copy-btn-trainer').style.display = 'block';
+        fastScroll();
+    }
+
+    function convertPkmnFicha(slot) {
+        const d = (id) => document.getElementById(id).value || "---";
+        const pkmnName = d(`p${slot}-name`);
+        const pNick = d(`p${slot}-nick`);
+        if(pkmnName === "---") return showNotify("Escolha um Pokémon primeiro!", "error");
+        const displayID = (pNick !== "---" && pNick !== "") ? `${pNick} (${pkmnName})` : pkmnName;
+        const isShiny = document.getElementById(`p${slot}-is-shiny`).value === 'true' ? ' ✨' : '';
+        const moves = [d(`p${slot}-m1`), d(`p${slot}-m2`), d(`p${slot}-m3`), d(`p${slot}-m4`)].filter(m => m !== "Golpe");
+        const statLabelMap = {hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'Sp.Ataque', spd: 'Sp.Defesa', spe: 'Velocidade'};
+        const nature = natures[d(`p${slot}-nature`)] || {plus: null, minus: null};
+        let statsText = "";
+        ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].forEach(s => {
+            const base = parseInt(d(`p${slot}-base-${s}`)) || 0;
+            const add = parseInt(d(`p${slot}-up-${s}`)) || 0;
+            const total = document.getElementById(`p${slot}-total-${s}`).innerText;
+            let percTotal = 0;
+            if(nature.plus === s) percTotal += 10;
+            if(nature.minus === s) percTotal -= 10;
+            percTotal += Math.floor(add / 10);
+            const percSign = percTotal >= 0 ? "+" : "";
+            statsText += `→ ${statLabelMap[s]}: ${base} (${percSign}${percTotal}%) = ${total}\n`;
+        });
+        const template = `°Ficha do Pokémon°\n\n` +
+            `- Nome: ${displayID}${isShiny}\n` +
+            `- Sexo: ${d(`p${slot}-gender`)}\n` +
+            `- Natureza: ${d(`p${slot}-nature`)}\n` +
+            `- Amizade: ${d(`p${slot}-friend`)}\n` +
+            `- Level: ${d(`p${slot}-lvl`)}\n` +
+            `- XP: ${d(`p${slot}-xp`)}\n\n` +
+            `------Status Puro------\n` +
+            `${statsText}\n` +
+            `------Habilidade------\n` +
+            `→ ${d(`p${slot}-ability`)}\n\n` +
+            `------Item equipado------\n` +
+            `→ ${d(`p${slot}-item`)}\n\n` +
+            `------Pokeball Usada------\n` +
+            `→ ${d(`p${slot}-ball`)}\n\n` +
+            `------Lista de Movimentos------\n` +
+            `${moves.map(m => `→ ${m}`).join('\n')}`;
+        const res = document.getElementById('convert-result-pokemon');
+        res.innerText = template; res.style.display = 'block';
+        document.getElementById('copy-btn-pokemon').style.display = 'block';
+        fastScroll();
+    }
+
+    function copyToClipboard(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => { showNotify("Copiado com sucesso!", "success"); }).catch(() => showNotify("Erro ao copiar.", "error"));
+    }
+
+    async function cloudAction(type) {
+        const user = document.getElementById('user-id').value;
+        const pass = document.getElementById('user-pass').value;
+        if(!user || !pass) return showNotify("Preencha login e senha!", "error");
+        
+        if(type === 'save') {
+            captureCurrentDataToObject();
+            const { error } = await _supabase.from('fichas').upsert({ username: user, password: pass, data: accountData }, { onConflict: 'username' });
+            if(error) showNotify("Erro ao salvar.", "error"); 
+            else { showNotify("Ficha salva com sucesso!", "success"); updateSelectors(); }
+        } else {
+            const { data } = await _supabase.from('fichas').select('*').eq('username', user).single();
+            if(data && data.password === pass) {
+                // Migração de dados antigos (sem slots)
+                if (!data.data.slot1) {
+                    accountData.slot1 = { data: data.data, avatar: data.avatar || "" };
+                    accountData.slot2 = { data: {}, avatar: "" };
+                } else {
+                    accountData = data.data;
+                }
+                await applyObjectToScreen();
+                updateSelectors();
+                showNotify(`Dados carregados!`, "success");
+            } else showNotify("Acesso negado.", "error");
+        }
+    }
+
+    document.getElementById('file-input').onchange = (e) => {
+        if(!e.target.files.length) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = document.getElementById('image-to-crop'); img.src = event.target.result;
+            document.getElementById('crop-modal').style.display = 'flex';
+            if(cropper) cropper.destroy();
+            cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 0.8, cropBoxMovable: false, cropBoxResizable: false });
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    function finishCrop() {
+        const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
+        const img = document.getElementById('main-avatar');
+        img.src = canvas.toDataURL(); img.style.display = 'block';
+        document.getElementById('placeholder').style.display = 'none';
+        document.getElementById('crop-modal').style.display = 'none';
+        showNotify("Avatar atualizado!", "success");
+    }
+
+    init();
+</script>
+</body>
+</html>
